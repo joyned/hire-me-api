@@ -61,6 +61,10 @@ def get_book(size):
     data = create_all(int(size))
     return jsonify(data)
 
+@app.route('/api/test', methods=['GET'])
+def test():
+    return jsonify('working!')
+
 
 if __name__ == '__main__':
     #app.run(debug=True)
