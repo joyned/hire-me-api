@@ -1,0 +1,4 @@
+Flask==1.1.1
+Flask-RESTful==0.3.8
+Flask-Cors==3.0.8
+gunicorn==19.10.0
