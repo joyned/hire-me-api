@@ -66,7 +66,7 @@ def get_book(size):
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
-    return jsonify("success: {}".format(validate_login(data.get('user'), data.get('password'))))
+    return jsonify("{success: {} }".format(validate_login(data.get('user'), data.get('password'))))
 
 
 def validate_login(user, pwd):
