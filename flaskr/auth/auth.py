@@ -1,4 +1,5 @@
 import pyrebase
+from flask import jsonify
 
 config = {
     "apiKey": "AIzaSyAsBtBjcuEu4ZEF0irkefd9v62iy-XCR54",
@@ -11,12 +12,18 @@ config = {
     "measurementId": "G-GB8K4SS15V"
 }
 
-
 firebase = pyrebase.initialize_app(config)
 
 auth = firebase.auth()
 
 
 def auth_user(email, pwd):
-    return auth.sign_in_with_email_and_password(email, pwd)
+    res = None
 
+    try:
+        res = auth.sign_in_with_email_and_password(email, pwd)
+    except Exception as ex:
+        res = {
+            'message': 'Erro while trying to login.',
+        }
+    return res
