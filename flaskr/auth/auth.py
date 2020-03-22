@@ -18,12 +18,4 @@ auth = firebase.auth()
 
 
 def auth_user(email, pwd):
-    res = None
-
-    try:
-        res = auth.sign_in_with_email_and_password(email, pwd)
-    except Exception as ex:
-        res = {
-            'message': 'Erro while trying to login.',
-        }
-    return res
+    return auth.sign_in_with_email_and_password(email, pwd)
