@@ -3,3 +3,4 @@ class User:
         self.id = ""
         self.user = ""
         self.password = ""
+        self.user_name = ""
