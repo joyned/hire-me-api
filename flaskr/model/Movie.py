@@ -1,4 +1,5 @@
 class Movie:
+
     def __init__(self):
         self.page_id = 2
         self.id = 0

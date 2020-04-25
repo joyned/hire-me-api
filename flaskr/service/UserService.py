@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify, request, make_response
 from flaskr.repository import UserRepository
 from flaskr.model.User import User
 from werkzeug.security import generate_password_hash, check_password_hash
+import flaskr.repository.PageRepository as PageRepository
 
 app_config = yaml.load(open('app_config.yml'))
 user_service = Blueprint('user_service', __name__)
@@ -66,7 +67,8 @@ def validate_user(user, pwd):
                 'user_name': user.user_name,
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
             }, app_config['config']['key'])
-            return jsonify({'user_id': user.id, 'user_name': user.user_name, 'time': datetime.datetime.utcnow(), 'token': token.decode('UTF-8')})
+            pages = PageRepository.get_all_pages_by_user_id(user.id)
+            return jsonify({'user_id': user.id, 'user_name': user.user_name, 'time': datetime.datetime.utcnow(), 'token': token.decode('UTF-8'), 'pages': pages})
         else:
             return make_response('User and/or password are wrong.', 401,
                                  {'WWW-Authenticate': 'Base-realm="User and/or password are wrong.'})

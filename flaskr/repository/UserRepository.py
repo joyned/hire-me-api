@@ -8,7 +8,7 @@ def check_if_user_exists_on_database(user):
 
 
 def insert_new_user(user, pwd):
-    sql = "insert into Usuario values (%s, %s)"
+    sql = "insert into Usuario values (%s, %s, 2)"
     param = (user, pwd)
     db.execute_insert(sql, param)
 
