@@ -51,11 +51,11 @@ def apply_job():
     return jsonify({'message': 'Applied successfully.'})
 
 
-@job_service.route('/api/applied-jobs/<userId>', methods=['GET'])
+@job_service.route('/api/applied-jobs/<candidateId>', methods=['GET'])
 @token_validator(request)
-def get_applied_jobs(user):
+def get_applied_jobs(candidateId):
     job_list = []
-    for row in JobRepository.get_applied_jobs(user):
+    for row in JobRepository.get_applied_jobs(candidateId):
         job = Job()
         job.id = row[0]
         job.title = row[1]
@@ -63,4 +63,4 @@ def get_applied_jobs(user):
         job.state = row[3]
         job.country = row[4]
         job_list.append(job.serialize())
-    return jsonify({"user": user, "applied_jobs": job_list})
+    return jsonify({"candidate_id": candidateId, "applied_jobs": job_list})
