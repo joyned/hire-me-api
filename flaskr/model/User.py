@@ -4,3 +4,4 @@ class User:
         self.user = ""
         self.password = ""
         self.user_name = ""
+        self.candidate_id = ""
