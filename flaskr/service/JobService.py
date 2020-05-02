@@ -41,7 +41,7 @@ def get_details(id):
     return jsonify(job.serialize())
 
 
-@job_service.route('/api/job-apply')
+@job_service.route('/api/job-apply', methods=['POST'])
 @token_validator(request)
 def apply_job():
     data = request.get_json()
@@ -51,7 +51,7 @@ def apply_job():
     return jsonify({'message': 'Applied successfully.'})
 
 
-@job_service.route('/api/applied-jobs')
+@job_service.route('/api/applied-jobs', methods=['GET'])
 @token_validator(request)
 def get_applied_jobs():
     data = request.get_json()
