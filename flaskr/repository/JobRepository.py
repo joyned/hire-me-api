@@ -3,7 +3,7 @@ from flaskr.database import database as db
 
 def get_jobs():
     sql = """
-        SELECT Codigo,
+        SELECT Id,
                Nome,
                Cidade,
                Estado,
@@ -16,7 +16,7 @@ def get_jobs():
 
 def get_job_by_id(id):
     sql = """
-        SELECT Codigo,
+        SELECT Id,
                Nome,
                Cidade,
                Estado,
