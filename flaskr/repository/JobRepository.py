@@ -26,7 +26,7 @@ def get_job_by_id(id):
                Cod_Area,
                Cod_Nivel_Cargo
         FROM   Vaga
-        WHERE  Codigo = %d
+        WHERE  Id = %d
     """
     param = (id)
     return db.execute_query_fetchone(sql, param)
