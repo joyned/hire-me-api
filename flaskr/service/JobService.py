@@ -51,11 +51,9 @@ def apply_job():
     return jsonify({'message': 'Applied successfully.'})
 
 
-@job_service.route('/api/applied-jobs', methods=['GET'])
+@job_service.route('/api/applied-jobs/<userId>', methods=['GET'])
 @token_validator(request)
-def get_applied_jobs():
-    data = request.get_json()
-    user = data['userId']
+def get_applied_jobs(user):
     job_list = []
     for row in JobRepository.get_applied_jobs(user):
         job = Job()
