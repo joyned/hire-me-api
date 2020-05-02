@@ -30,3 +30,27 @@ def get_job_by_id(id):
     """
     param = (id)
     return db.execute_query_fetchone(sql, param)
+
+
+def apply_to_job(userId, jobId):
+    sql = """
+        insert into VagasAplicadas (Id_Vaga, Id_Candidato) values (%d, %d)
+    """
+    param = (userId, jobId)
+    db.execute_insert(sql, param)
+
+
+def get_applied_jobs(userId):
+    sql = """
+    SELECT  Vaga.Id,
+            Vaga.Nome,
+            Vaga.Cidade,
+            Vaga.Estado,
+            Vaga.Pais
+    FROM    Vaga
+    JOIN VagasAplicadas
+    ON VagasAplicadas.Id_Vaga = Vaga.Id
+    AND VagasAplicadas.Id_Candidato = %d
+    """
+    param = (userId)
+    return db.execute_query_fetchall(sql, param)
