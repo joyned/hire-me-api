@@ -36,7 +36,7 @@ def apply_to_job(userId, jobId):
     sql = """
         insert into VagasAplicadas (Id_Vaga, Id_Candidato) values (%d, %d)
     """
-    param = (userId, jobId)
+    param = (jobId, userId)
     db.execute_insert(sql, param)
 
 
