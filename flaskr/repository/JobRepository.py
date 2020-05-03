@@ -54,3 +54,13 @@ def get_applied_jobs(userId):
     """
     param = (userId)
     return db.execute_query_fetchall(sql, param)
+
+
+# TODO: THIS METHOD NEEDS TO BE REVIEWED, IS NOT GOOD DELETE SOMETHING FROM DATABASE, NEED TO CONSIDER CREATE A FLAG
+#  TO SET INACTIVE
+def delete_apply_to_job(userId, jobId):
+    sql = """
+            delete from VagasAplicadas where Id_Vaga = %d and Id_Candidato = %d
+        """
+    param = (jobId, userId)
+    db.execute_delete(sql, param)

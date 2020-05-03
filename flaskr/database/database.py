@@ -32,3 +32,7 @@ def execute_insert(sql, param):
     cursor.execute(sql, param)
     conn.commit()
 
+
+def execute_delete(sql, param):
+    cursor.execute(sql, param)
+    conn.commit()

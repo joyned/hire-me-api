@@ -41,6 +41,7 @@ def get_details(id):
     return jsonify(job.serialize())
 
 
+# TODO: REVIEW THE RETURN
 @job_service.route('/api/job-apply', methods=['POST'])
 @token_validator(request)
 def apply_job():
@@ -64,3 +65,15 @@ def get_applied_jobs(candidateId):
         job.country = row[4]
         job_list.append(job.serialize())
     return jsonify({"candidate_id": candidateId, "applied_jobs": job_list})
+
+
+# TODO: THIS METHOD NEEDS TO BE REVIEWED, IS NOT GOOD DELETE SOMETHING FROM DATABASE, NEED TO CONSIDER CREATE A FLAG
+#  TO SET INACTIVE. IT NEEDS TO REVIEW THE RETURN TOO.
+@job_service.route('/api/delete_applied', methods=['DELETE'])
+@token_validator(request)
+def delete_apply_to_job():
+    data = request.get_json()
+    user = data['userId']
+    job = data['jobId']
+    JobRepository.delete_apply_to_job(user, job)
+    return jsonify({'message': 'Applied successfully.'})
