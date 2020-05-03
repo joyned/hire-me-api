@@ -76,4 +76,4 @@ def delete_apply_to_job():
     user = data['candidateId']
     job = data['jobId']
     JobRepository.delete_apply_to_job(user, job)
-    return jsonify({'message': 'Deleted successfully.'})
+    return jsonify({'message': 'Applied successfully.'})
