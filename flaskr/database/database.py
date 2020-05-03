@@ -14,25 +14,43 @@ conn = pymssql.connect(connection['host'], connection['username'], connection['p
 cursor = conn.cursor()
 
 
+def close_connection():
+    def decorator_func(func):
+        def wrapper_func(*args, **kwargs):
+            # Invoke the wrapped function first
+            retval = func(*args, **kwargs)
+            # Now do something here with retval and/or action
+            close()
+            return retval
+
+        return wrapper_func
+
+    return decorator_func
+
+
 def close():
     cursor.close()
 
 
+@close_connection()
 def execute_query_fetchall(sql, param):
     cursor.execute(sql, param)
     return cursor.fetchall()
 
 
+@close_connection()
 def execute_query_fetchone(sql, param):
     cursor.execute(sql, param)
     return cursor.fetchone()
 
 
+@close_connection()
 def execute_insert(sql, param):
     cursor.execute(sql, param)
     conn.commit()
 
 
+@close_connection()
 def execute_delete(sql, param):
     cursor.execute(sql, param)
     conn.commit()
