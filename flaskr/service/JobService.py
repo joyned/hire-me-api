@@ -69,7 +69,7 @@ def get_applied_jobs(candidateId):
 
 # TODO: THIS METHOD NEEDS TO BE REVIEWED, IS NOT GOOD DELETE SOMETHING FROM DATABASE, NEED TO CONSIDER CREATE A FLAG
 #  TO SET INACTIVE. IT NEEDS TO REVIEW THE RETURN TOO.
-@job_service.route('/api/delete-applied-job', methods=['POST'])
+@job_service.route('/api/delete-applied-job', methods=['DELETE'])
 @token_validator(request)
 def delete_apply_to_job():
     data = request.get_json()

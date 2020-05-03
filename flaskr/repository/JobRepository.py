@@ -50,7 +50,6 @@ def get_applied_jobs(userId):
     FROM    Vaga
     JOIN VagasAplicadas
     ON VagasAplicadas.Id_Vaga = Vaga.Id
-    AND VagasAplicadas.Ativo = 'T'
     AND VagasAplicadas.Id_Candidato = %d
     """
     param = (userId)
@@ -61,7 +60,7 @@ def get_applied_jobs(userId):
 #  TO SET INACTIVE
 def delete_apply_to_job(userId, jobId):
     sql = """
-            update VagasAplicadas set Ativo = 'F' where Id_Vaga = %d and Id_Candidato = %d
+            delete from VagasAplicadas where Id_Vaga = %d and Id_Candidato = %d
         """
     param = (jobId, userId)
     db.execute_delete(sql, param)
