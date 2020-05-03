@@ -32,25 +32,21 @@ def close():
     cursor.close()
 
 
-@close_connection()
 def execute_query_fetchall(sql, param):
     cursor.execute(sql, param)
     return cursor.fetchall()
 
 
-@close_connection()
 def execute_query_fetchone(sql, param):
     cursor.execute(sql, param)
     return cursor.fetchone()
 
 
-@close_connection()
 def execute_insert(sql, param):
     cursor.execute(sql, param)
     conn.commit()
 
 
-@close_connection()
 def execute_delete(sql, param):
     cursor.execute(sql, param)
     conn.commit()
