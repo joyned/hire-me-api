@@ -67,7 +67,7 @@ def validate_user(user, pwd):
                 'user_id': user.id,
                 'candidate_id': user.candidate_id,
                 'user_name': user.user_name,
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=100000)
             }, app_config['config']['key'])
             pages = PageRepository.get_all_pages_by_user_id(user.id)
             return jsonify({'user_id': user.id, 'candidate_id': user.candidate_id, 'user_name': user.user_name, 'time': datetime.datetime.utcnow(), 'token': token.decode('UTF-8'), 'pages': pages})
