@@ -73,7 +73,7 @@ def get_applied_jobs(candidateId):
 @token_validator(request)
 def delete_apply_to_job():
     data = request.get_json()
-    user = data['userId']
+    user = data['candidateId']
     job = data['jobId']
     JobRepository.delete_apply_to_job(user, job)
     return jsonify({'message': 'Deleted successfully.'})
