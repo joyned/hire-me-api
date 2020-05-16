@@ -28,5 +28,5 @@ def check_permission(user_id, page):
     WHERE Usuario.Codigo = %d
     AND Paginas.Id = PermissaoPaginas.Id_Pagina
     """
-    param = (user_id, page)
+    param = (page, user_id)
     return db.execute_query_fetchone(sql, param)
