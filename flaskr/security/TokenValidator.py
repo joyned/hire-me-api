@@ -15,7 +15,7 @@ def token_validator(request):
             if not token:
                 return jsonify({'message': 'Token is missing.'}), 401
             try:
-                data = jwt.decode(token, app_config['config']['key'])
+                jwt.decode(token, app_config['config']['key'])
             except:
                 return jsonify({'message': 'Token is invalid.'}), 401
             return f(*args, **kwargs)
