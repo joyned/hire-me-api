@@ -6,7 +6,7 @@ from flaskr.security.TokenValidator import token_validator
 page_service = Blueprint('page_service', __name__)
 
 
-@page_service.route('/api/pages/<userId>', methods=['GET'])
+@page_service.route('/api/pages/<user_id>', methods=['GET'])
 @token_validator(request)
 def get_pages(user_id):
     page_list = []
