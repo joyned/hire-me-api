@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from flaskr.repository.PageRepository import get_all_pages_by_user_id
+from flaskr.repository.PageRepository import *
 from flaskr.model.Pages import Pages
 from flaskr.security.TokenValidator import token_validator
 
@@ -19,3 +19,15 @@ def get_pages(user_id):
         page_list.append(page.serialize())
     return jsonify({"userId": user_id, "pages": page_list})
 
+
+@page_service.route('/api/permision-on-page', methods=['POST'])
+@token_validator(request)
+def check_permisson():
+    data = request.get_json()
+    user_id = data['userId']
+    page = data['page']
+    res = check_permission(user_id, page)
+    if res is None:
+        return jsonify({"load": False})
+    else:
+        return jsonify({"load": True})
