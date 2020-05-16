@@ -24,7 +24,7 @@ def check_permission(user_id, page):
     JOIN PermissaoPaginas
         ON PermissaoPaginas.Permissao = Usuario.Id_Perfil_Usuario
     JOIN Paginas
-        ON Paginas.Constante = '%s'
+        ON Paginas.Constante = %s
     WHERE Usuario.Codigo = %d
     AND Paginas.Id = PermissaoPaginas.Id_Pagina
     """
