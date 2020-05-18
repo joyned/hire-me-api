@@ -10,17 +10,13 @@ connection = {
     'db': db_properties['user']['db']
 }
 
-conn = pymssql.connect(connection['host'], connection['username'], connection['password'], connection['db'])
-cursor = conn.cursor()
 
-
-def close_connection():
+def db_connection():
     def decorator_func(func):
         def wrapper_func(*args, **kwargs):
             # Invoke the wrapped function first
             retval = func(*args, **kwargs)
             # Now do something here with retval and/or action
-            close()
             return retval
 
         return wrapper_func
@@ -28,25 +24,48 @@ def close_connection():
     return decorator_func
 
 
-def close():
-    cursor.close()
+def create_connection():
+    return pymssql.connect(connection['host'], connection['username'], connection['password'], connection['db'])
 
 
 def execute_query_fetchall(sql, param):
+    conn = create_connection()
+    cursor = conn.cursor()
     cursor.execute(sql, param)
-    return cursor.fetchall()
+    res = cursor.fetchall()
+    conn.close()
+    return res
 
 
 def execute_query_fetchone(sql, param):
+    conn = create_connection()
+    cursor = conn.cursor()
     cursor.execute(sql, param)
-    return cursor.fetchone()
+    res = cursor.fetchone()
+    conn.close()
+    return res
 
 
 def execute_insert(sql, param):
+    conn = create_connection()
+    cursor = conn.cursor()
     cursor.execute(sql, param)
     conn.commit()
+    conn.close()
 
 
 def execute_delete(sql, param):
+    conn = create_connection()
+    cursor = conn.cursor()
     cursor.execute(sql, param)
     conn.commit()
+    conn.close()
+
+
+def execute_count_lines(sql, param):
+    conn = pymssql.connect(connection['host'], connection['username'], connection['password'], connection['db'])
+    cursor = conn.cursor()
+    cursor.execute(sql, param)
+    res = cursor.rowcount()
+    conn.close()
+    return res

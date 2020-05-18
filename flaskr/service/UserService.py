@@ -76,3 +76,13 @@ def validate_user(user, pwd):
                                  {'WWW-Authenticate': 'Base-realm="User and/or password are wrong.'})
 
 
+@user_service.route('/api/users-profiles', methods=['GET'])
+def get_users_profiles():
+    users_profiles = []
+    for row in UserRepository.get_users_profiles():
+        user_profile = {
+            'id': row[0],
+            'constante': row[1]
+        }
+        users_profiles.append(user_profile)
+    return jsonify(users_profiles)

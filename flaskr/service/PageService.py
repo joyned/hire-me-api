@@ -24,8 +24,8 @@ def get_pages(user_id):
 @token_validator(request)
 def check_permisson():
     data = request.get_json()
-    user_id = data['userId']
-    page = data['page']
+    user_id = data.get('userId')
+    page = data.get('page')
     res = check_permission(user_id, page)
     if res is None:
         return jsonify({"message": 'Permission denied!'}), 401
