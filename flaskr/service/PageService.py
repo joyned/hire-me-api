@@ -28,6 +28,6 @@ def check_permisson():
     page = data['page']
     res = check_permission(user_id, page)
     if res is None:
-        return jsonify({"load": False})
+        return jsonify({"message": 'Permission denied!'}), 401
     else:
-        return jsonify({"load": True})
+        return jsonify({"load": True}), 200
