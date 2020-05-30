@@ -69,3 +69,11 @@ def execute_count_lines(sql, param):
     res = cursor.rowcount()
     conn.close()
     return res
+
+
+def execute_procedure(procedure, param):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.callproc(procedure, param)
+    conn.commit()
+    conn.close()

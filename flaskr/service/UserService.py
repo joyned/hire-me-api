@@ -17,12 +17,31 @@ def register():
     hash_password = generate_password_hash(data.get('password'), method='sha256')
     check_user = check_if_user_exists(data.get('user'))
     if not check_user == "user_avaliable":
-        message = register_error_message(check_user)
+        return jsonify(register_error_message(check_user)), 406
     else:
-        UserRepository.insert_new_user(data.get('user'), hash_password)
-        message = 'New user created.'
+        register_new_user(data, hash_password)
+        return jsonify('New user created.'), 200
 
-    return jsonify({'message': message})
+
+def register_new_user(request, hash_password):
+    user = (
+        request.get('user'),
+        hash_password,
+        request.get('name'),
+        request.get('cpf'),
+        request.get('rg'),
+        request.get('fullname'),
+        request.get('birthDate'),
+        request.get('city'),
+        request.get('state'),
+        request.get('country'),
+        request.get('address'),
+        request.get('addressNumber'),
+        request.get('zipCode'),
+        request.get('complement'),
+        request.get('email')
+    )
+    UserRepository.register_new_user(user)
 
 
 def check_if_user_exists(user):
@@ -70,7 +89,8 @@ def validate_user(user, pwd):
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=100000)
             }, app_config['config']['key'])
             pages = PageRepository.get_all_pages_by_user_id(user.id)
-            return jsonify({'user_id': user.id, 'candidate_id': user.candidate_id, 'user_name': user.user_name, 'time': datetime.datetime.utcnow(), 'token': token.decode('UTF-8'), 'pages': pages})
+            return jsonify({'user_id': user.id, 'candidate_id': user.candidate_id, 'user_name': user.user_name,
+                            'time': datetime.datetime.utcnow(), 'token': token.decode('UTF-8'), 'pages': pages})
         else:
             return make_response('User and/or password are wrong.', 401,
                                  {'WWW-Authenticate': 'Base-realm="User and/or password are wrong.'})
