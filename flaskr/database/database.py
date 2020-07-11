@@ -17,7 +17,7 @@ connection_local = {
     'db': 'HireMe'
 }
 
-prod = False
+prod = True
 
 
 def db_connection():
