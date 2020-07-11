@@ -3,10 +3,12 @@ class Pages:
         self.id = 0
         self.constant = ''
         self.name = ''
+        self.icon = ''
 
     def serialize(self):
         return {
             "id": self.id,
             "constant": self.constant,
-            "name": self.name
+            "name": self.name,
+            "icon": self.icon
         }

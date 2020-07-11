@@ -10,6 +10,15 @@ connection = {
     'db': db_properties['user']['db']
 }
 
+connection_local = {
+    'host': 'localhost',
+    'username': 'SA',
+    'password': '$b4tr0x2568251$',
+    'db': 'HireMe'
+}
+
+prod = False
+
 
 def db_connection():
     def decorator_func(func):
@@ -28,8 +37,16 @@ def create_connection():
     return pymssql.connect(connection['host'], connection['username'], connection['password'], connection['db'])
 
 
+def create_local_connection():
+    return pymssql.connect(connection_local['host'], connection_local['username'], connection_local['password'],
+                           connection_local['db'])
+
+
 def execute_query_fetchall(sql, param):
-    conn = create_connection()
+    if prod:
+        conn = create_connection()
+    else:
+        conn = create_local_connection()
     cursor = conn.cursor()
     cursor.execute(sql, param)
     res = cursor.fetchall()
@@ -38,7 +55,10 @@ def execute_query_fetchall(sql, param):
 
 
 def execute_query_fetchone(sql, param):
-    conn = create_connection()
+    if prod:
+        conn = create_connection()
+    else:
+        conn = create_local_connection()
     cursor = conn.cursor()
     cursor.execute(sql, param)
     res = cursor.fetchone()
@@ -47,7 +67,10 @@ def execute_query_fetchone(sql, param):
 
 
 def execute_insert(sql, param):
-    conn = create_connection()
+    if prod:
+        conn = create_connection()
+    else:
+        conn = create_local_connection()
     cursor = conn.cursor()
     cursor.execute(sql, param)
     conn.commit()
@@ -55,7 +78,10 @@ def execute_insert(sql, param):
 
 
 def execute_delete(sql, param):
-    conn = create_connection()
+    if prod:
+        conn = create_connection()
+    else:
+        conn = create_local_connection()
     cursor = conn.cursor()
     cursor.execute(sql, param)
     conn.commit()
@@ -63,7 +89,10 @@ def execute_delete(sql, param):
 
 
 def execute_count_lines(sql, param):
-    conn = pymssql.connect(connection['host'], connection['username'], connection['password'], connection['db'])
+    if prod:
+        conn = create_connection()
+    else:
+        conn = create_local_connection()
     cursor = conn.cursor()
     cursor.execute(sql, param)
     res = cursor.rowcount()
@@ -72,7 +101,10 @@ def execute_count_lines(sql, param):
 
 
 def execute_procedure(procedure, param):
-    conn = create_connection()
+    if prod:
+        conn = create_connection()
+    else:
+        conn = create_local_connection()
     cursor = conn.cursor()
     cursor.callproc(procedure, param)
     conn.commit()

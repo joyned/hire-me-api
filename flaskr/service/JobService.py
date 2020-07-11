@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, app
 from flask import Blueprint
 import flaskr.repository.JobRepository as JobRepository
+from flaskr.model.HireMeContext import HireMeContext
 from flaskr.model.Job import Job
 from flaskr.security.TokenValidator import token_validator
 
@@ -45,18 +46,24 @@ def get_details(id):
 @job_service.route('/api/job-apply', methods=['POST'])
 @token_validator(request)
 def apply_job():
+    context = HireMeContext()
+    context.build(request)
+
     data = request.get_json()
-    user = data['userId']
     job = data['jobId']
-    JobRepository.apply_to_job(user, job)
+
+    JobRepository.apply_to_job(context.candidate_id, job)
     return jsonify({'message': 'Applied successfully.'})
 
 
-@job_service.route('/api/applied-jobs/<candidateId>', methods=['GET'])
+@job_service.route('/api/applied-jobs/', methods=['GET'])
 @token_validator(request)
-def get_applied_jobs(candidateId):
+def get_applied_jobs():
+    context = HireMeContext()
+    context.build(request)
+
     job_list = []
-    for row in JobRepository.get_applied_jobs(candidateId):
+    for row in JobRepository.get_applied_jobs(context.candidate_id):
         job = Job()
         job.id = row[0]
         job.title = row[1]
@@ -64,7 +71,7 @@ def get_applied_jobs(candidateId):
         job.state = row[3]
         job.country = row[4]
         job_list.append(job.serialize())
-    return jsonify({"candidate_id": candidateId, "applied_jobs": job_list})
+    return jsonify({"candidate_id": context.candidate_id, "applied_jobs": job_list})
 
 
 # TODO: THIS METHOD NEEDS TO BE REVIEWED, IS NOT GOOD DELETE SOMETHING FROM DATABASE, NEED TO CONSIDER CREATE A FLAG
@@ -72,8 +79,11 @@ def get_applied_jobs(candidateId):
 @job_service.route('/api/delete-applied-job', methods=['DELETE'])
 @token_validator(request)
 def delete_apply_to_job():
+    context = HireMeContext()
+    context.build(request)
+
     data = request.get_json()
-    user = data['candidateId']
     job = data['jobId']
-    JobRepository.delete_apply_to_job(user, job)
+
+    JobRepository.delete_apply_to_job(context.candidate_id, job)
     return jsonify({'message': 'Applied successfully.'})

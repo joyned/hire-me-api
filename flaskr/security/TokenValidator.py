@@ -23,3 +23,8 @@ def token_validator(request):
         return decorate
 
     return token_required
+
+
+def token_decode(request):
+    token = request.headers.get('Authorization')
+    return jwt.decode(token, app_config['config']['key'])

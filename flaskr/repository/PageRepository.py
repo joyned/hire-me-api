@@ -6,6 +6,7 @@ def get_all_pages_by_user_id(user_id):
     SELECT  Paginas.Id,
             Paginas.Constante,
             PaginasInf.Nome,
+            Paginas.Icone,
             PermissaoPaginas.Permissao
     FROM    Paginas
     JOIN PaginasInf
