@@ -76,14 +76,12 @@ def get_applied_jobs():
 
 # TODO: THIS METHOD NEEDS TO BE REVIEWED, IS NOT GOOD DELETE SOMETHING FROM DATABASE, NEED TO CONSIDER CREATE A FLAG
 #  TO SET INACTIVE. IT NEEDS TO REVIEW THE RETURN TOO.
-@job_service.route('/api/delete-applied-job', methods=['DELETE'])
+@job_service.route('/api/delete-applied-job/<jobId>', methods=['POST'])
 @token_validator(request)
-def delete_apply_to_job():
+def delete_apply_to_job(jobId):
     context = HireMeContext()
     context.build(request)
+    print(context.candidate_id)
 
-    data = request.get_json()
-    job = data['jobId']
-
-    JobRepository.delete_apply_to_job(context.candidate_id, job)
+    JobRepository.delete_apply_to_job(context.candidate_id, jobId)
     return jsonify({'message': 'Applied successfully.'})
