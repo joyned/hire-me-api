@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request, app
 from flask import Blueprint
+from flask_cors import cross_origin
+
 import flaskr.repository.JobRepository as JobRepository
 from flaskr.model.HireMeContext import HireMeContext
 from flaskr.model.Job import Job
@@ -58,6 +60,7 @@ def apply_job():
 
 @job_service.route('/api/applied-jobs/', methods=['GET'])
 @token_validator(request)
+@cross_origin()
 def get_applied_jobs():
     context = HireMeContext()
     context.build(request)

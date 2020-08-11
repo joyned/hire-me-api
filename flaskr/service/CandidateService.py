@@ -1,5 +1,6 @@
 from flask import Blueprint
 from flask import jsonify, request
+from flask_cors import cross_origin
 
 import flaskr.repository.CandidateRepository as CandidateRepository
 from flaskr.model.Candidate import Candidate
@@ -11,6 +12,7 @@ candidate_service = Blueprint('candidate_service', __name__)
 
 @token_validator(request)
 @candidate_service.route('/api/candidate/get', methods=['GET'])
+@cross_origin()
 def get_candidate_details():
     context = HireMeContext()
     context.build(request)
@@ -36,6 +38,7 @@ def get_candidate_details():
 
 @token_validator(request)
 @candidate_service.route('/api/candidate/update', methods=['POST'])
+@cross_origin()
 def update_candidate_details():
     data = request.get_json()
     candidate = Candidate()
