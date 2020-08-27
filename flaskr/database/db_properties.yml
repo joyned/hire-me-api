@@ -1,5 +1,5 @@
 user:
     username: admin
     password: $B4tr0x2568251$
-    db: HireMe
+    db: HireMeRemodel
     host: hire-me.ceqbjxyoaid9.us-east-1.rds.amazonaws.com

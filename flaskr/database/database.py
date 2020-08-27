@@ -14,7 +14,7 @@ connection_local = {
     'host': 'localhost',
     'username': 'SA',
     'password': '$b4tr0x2568251$',
-    'db': 'HireMe'
+    'db': 'HireMeRemodel'
 }
 
 prod = True

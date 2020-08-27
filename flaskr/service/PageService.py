@@ -15,7 +15,7 @@ def get_pages():
     context.build(request)
 
     page_list = []
-    res = get_all_pages_by_user_id(context.user_id)
+    res = get_all_pages_by_user_id(context.user_profile_id)
     for row in res:
         page = Pages()
         page.id = row[0]
@@ -30,9 +30,8 @@ def get_pages():
 @token_validator(request)
 def check_permisson():
     data = request.get_json()
-    user_id = data.get('userId')
-    page = data.get('page')
-    res = check_permission(user_id, page)
+    context = HireMeContext().build(request)
+    res = check_permission(context.user_profile_id, data['pageId'])
     if res is None:
         return jsonify({"message": 'Permission denied!'}), 401
     else:

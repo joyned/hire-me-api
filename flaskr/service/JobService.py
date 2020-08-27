@@ -5,6 +5,7 @@ from flask_cors import cross_origin
 import flaskr.repository.JobRepository as JobRepository
 from flaskr.model.HireMeContext import HireMeContext
 from flaskr.model.Job import Job
+from flaskr.response import Response
 from flaskr.security.TokenValidator import token_validator
 
 job_service = Blueprint('job_service', __name__)
@@ -41,11 +42,11 @@ def get_details(id):
     job.country = result[4]
     job.salary = result[5]
     job.description = result[6]
-    return jsonify(job.serialize())
+    return Response.ok(job.serialize())
 
 
 # TODO: REVIEW THE RETURN
-@job_service.route('/api/job-apply', methods=['POST'])
+@job_service.route('/api/job/apply', methods=['POST'])
 @token_validator(request)
 def apply_job():
     context = HireMeContext()
@@ -54,11 +55,11 @@ def apply_job():
     data = request.get_json()
     job = data['jobId']
 
-    JobRepository.apply_to_job(context.candidate_id, job)
-    return jsonify({'message': 'Applied successfully.'})
+    JobRepository.apply_to_job(context.person_id, job)
+    return Response.ok({'message': 'Applied successfully.'})
 
 
-@job_service.route('/api/applied-jobs/', methods=['GET'])
+@job_service.route('/api/job/applied', methods=['GET'])
 @token_validator(request)
 @cross_origin()
 def get_applied_jobs():
@@ -66,7 +67,7 @@ def get_applied_jobs():
     context.build(request)
 
     job_list = []
-    for row in JobRepository.get_applied_jobs(context.candidate_id):
+    for row in JobRepository.get_applied_jobs(context.person_id):
         job = Job()
         job.id = row[0]
         job.title = row[1]
@@ -74,17 +75,16 @@ def get_applied_jobs():
         job.state = row[3]
         job.country = row[4]
         job_list.append(job.serialize())
-    return jsonify({"candidate_id": context.candidate_id, "applied_jobs": job_list})
+    return Response.ok({"person_id": context.person_id, "applied_jobs": job_list})
 
 
 # TODO: THIS METHOD NEEDS TO BE REVIEWED, IS NOT GOOD DELETE SOMETHING FROM DATABASE, NEED TO CONSIDER CREATE A FLAG
 #  TO SET INACTIVE. IT NEEDS TO REVIEW THE RETURN TOO.
-@job_service.route('/api/delete-applied-job/<jobId>', methods=['POST'])
+@job_service.route('/api/job/delete/<job_id>', methods=['POST'])
 @token_validator(request)
-def delete_apply_to_job(jobId):
+def delete_apply_to_job(job_id):
     context = HireMeContext()
     context.build(request)
-    print(context.candidate_id)
 
-    JobRepository.delete_apply_to_job(context.candidate_id, jobId)
-    return jsonify({'message': 'Applied successfully.'})
+    JobRepository.delete_apply_to_job(context.person_id, job_id)
+    return Response.ok({'message': 'Deleted successfully.'})

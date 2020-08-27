@@ -1,33 +1,31 @@
 from flaskr.database import database as db
 
 
-def get_all_pages_by_user_id(user_id):
+def get_all_pages_by_user_id(user_profile_id):
     sql = """
-    SELECT  Paginas.Id,
-            Paginas.Constante,
-            PaginasInf.Nome,
-            Paginas.Icone,
-            PermissaoPaginas.Permissao
-    FROM    Paginas
-    JOIN PaginasInf
-        ON PaginasInf.Id_Pagina = Paginas.Id
-    JOIN PermissaoPaginas
-        ON PermissaoPaginas.Id_Pagina = Paginas.Id
-    WHERE PermissaoPaginas.Permissao = (SELECT Usuario.Id_Perfil_Usuario FROM Usuario WHERE Codigo = %d)
+    SELECT  Pagina.Id,
+            Pagina.Constante,
+            PaginaInf.Nome,
+            Pagina.Icone,
+            PerfilUsuarioPermissaoPagina.Permissao
+    FROM    Pagina
+    JOIN PaginaInf
+        ON PaginaInf.Id_Pagina = Pagina.Id
+    JOIN PerfilUsuarioPermissaoPagina
+        ON PerfilUsuarioPermissaoPagina.Id_Pagina = Pagina.Id
+    WHERE PerfilUsuarioPermissaoPagina.Permissao = 'T'
+    AND   PerfilUsuarioPermissaoPagina.Id_Perfil_Usuario = %d
     """
-    return db.execute_query_fetchall(sql, user_id)
+    return db.execute_query_fetchall(sql, user_profile_id)
 
 
-def check_permission(user_id, page):
+def check_permission(user_profile_id, page_id):
     sql = """
-    SELECT 1
-    FROM    Usuario
-    JOIN PermissaoPaginas
-        ON PermissaoPaginas.Permissao = Usuario.Id_Perfil_Usuario
-    JOIN Paginas
-        ON Paginas.Constante = %s
-    WHERE Usuario.Codigo = %d
-    AND Paginas.Id = PermissaoPaginas.Id_Pagina
+    SELECT  1
+    FROM    PerfilUsuarioPermissaoPagina
+    WHERE PerfilUsuarioPermissaoPagina.Id_Perfil_Usuario = %d
+    AND PerfilUsuarioPermissaoPagina.Id_Pagina = %d
+    AND PerfilUsuarioPermissaoPagina.Permissao = 'T'
     """
-    param = (page, user_id)
+    param = (user_profile_id, page_id)
     return db.execute_query_fetchone(sql, param)
