@@ -26,13 +26,17 @@ def get_person_details(request):
     person.person_addres.number = int(result[12])
     person.person_addres.complement = result[13]
     person.person_addres.cep = int(result[14])
-
+    person.user.email = result[15]
     return person.serialize()
 
 
 def update_candidate_details(request):
+    context = HireMeContext()
+    context.build(request)
+
     data = request.get_json()
     person = Person()
+    person.id = context.person_id
     person.city = data['city']
     person.state = data['state']
     person.country = data['country']

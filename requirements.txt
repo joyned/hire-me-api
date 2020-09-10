@@ -1,13 +1,13 @@
 Cython
-Flask
+Flask~=1.1.1
 Flask-Cors
 Flask-PyMongo
 Flask-RESTful
 Jinja2
 MarkupSafe
-PyJWT
-PyYAML
-Werkzeug
+PyJWT~=1.7.1
+PyYAML~=5.3.1
+Werkzeug~=1.0.1
 click
 gunicorn
 itsdangerous
@@ -15,3 +15,4 @@ pip
 pymssql-linux
 setuptools
 six
+multipledispatch~=0.6.0

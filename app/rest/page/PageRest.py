@@ -10,7 +10,7 @@ page_rest = Blueprint('page_service', __name__)
 @page_rest.route('/api/pages/', methods=['GET'])
 @token_validator(request)
 def get_pages():
-    return Response.execute(PageService.get_pages, request, error_status_code=400)
+    return Response.execute(PageService.get_pages_by_request, request, error_status_code=400)
 
 
 @page_rest.route('/api/permision-on-page', methods=['POST'])

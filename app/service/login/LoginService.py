@@ -2,10 +2,9 @@ import datetime
 
 import jwt
 import yaml
-from flask import make_response
 from werkzeug.security import check_password_hash
 
-import app.repository.page.PageRepository as PageRepository
+import app.service.page.PageService as PageService
 from app.model.person.Person import Person
 from app.repository.login import LoginRepository
 
@@ -18,8 +17,8 @@ def login(request):
     request_pwd = data.get('password')
     if not (request_email == '' or request_email is None) or not (request_pwd == '' or request_pwd is None):
         return validate_email(request_email, request_pwd)
-
-    return 'Email and/or password are blank.'
+    else:
+        raise Exception('Email and/or password are blank.')
 
 
 def validate_email(email, pwd):
@@ -41,8 +40,8 @@ def validate_email(email, pwd):
                 'person_name': person.name,
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=100000)
             }, app_config['config']['key'])
-            pages = PageRepository.get_all_pages_by_user_id(person.user.user_profile_id)
+            pages = PageService.get_pages(person.user.user_profile_id)
             return {'user_id': person.user.id, 'person_id': person.id, 'person_name': person.name,
                     'time': datetime.datetime.utcnow(), 'token': token.decode('UTF-8'), 'pages': pages}
         else:
-            return 'Email and/or password are wrong.'
+            raise Exception('Email and/or password are wrong.')

@@ -17,3 +17,21 @@ def get_users_profiles():
         select id, constante from perfilusuario
     """
     return db.execute_query_fetchall(sql, ())
+
+
+def get_current_password_hash(user_id):
+    sql = """
+        SELECT Senha FROM Usuario WHERE Id = %d
+    """
+
+    return db.execute_query_fetchone(sql, user_id)
+
+
+def update_user_password(user_id, pwd):
+    sql = """
+        UPDATE Usuario SET Senha = %s WHERE Id = %d
+    """
+
+    param = (pwd, user_id)
+
+    db.execute_insert(sql, param)

@@ -17,10 +17,13 @@ def get_candidate_details(person_id):
             PessoaEndereco.Endereco,
             PessoaEndereco.Numero,
             PessoaEndereco.Complemento,
-            PessoaEndereco.CEP
+            PessoaEndereco.CEP,
+            Usuario.Email
       FROM  Pessoa
       JOIN  PessoaEndereco
          ON PessoaEndereco.Id_Pessoa = Pessoa.Id
+      JOIN  Usuario
+         ON Usuario.Id = Pessoa.Id_Usuario
     WHERE Pessoa.Id = %d
     """
     return db.execute_query_fetchone(sql, person_id)
@@ -33,7 +36,8 @@ def update_person(person):
             Estado = %s,
             Pais = %s,
             Foto = %s
+    WHERE   Id = %d
     """
-    param = (person.city, person.state, person.country, person.photo)
+    param = (person.city, person.state, person.country, person.photo, person.id)
 
     db.execute_insert(sql, param)
