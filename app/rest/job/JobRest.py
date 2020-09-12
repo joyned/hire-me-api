@@ -18,6 +18,11 @@ def get_all_jobs():
     return Response.execute(JobService.get_all_jobs, error_status_code=404)
 
 
+@job_rest.route('/api/job/filter', methods=['POST'])
+def filter_jobs():
+    return Response.execute(JobService.filter_jobs, error_status_code=400)
+
+
 @job_rest.route('/api/job/detail/<id>', methods=['POST'])
 def get_details(id):
     return Response.execute(JobService.get_details, id, error_status_code=400)
@@ -29,14 +34,20 @@ def apply_job():
     return Response.execute(JobService.apply_job, error_status_code=400)
 
 
-@job_rest.route('/api/job/applied', methods=['GET'])
+@job_rest.route('/api/job/person-applied/<id>', methods=['GET'])
+@token_validator(request)
+def check_if_person_are_applied_to_job(id):
+    return Response.execute(JobService.check_if_person_are_applied_to_job, id, error_status_code=400)
+
+
+@job_rest.route('/api/job/applied-jobs', methods=['GET'])
 @token_validator(request)
 @cross_origin()
 def get_applied_jobs():
     return Response.execute(JobService.get_applied_jobs, error_status_code=400)
 
 
-@job_rest.route('/api/job/delete/<job_id>', methods=['POST'])
+@job_rest.route('/api/job/delete/<id>', methods=['POST'])
 @token_validator(request)
 def delete_apply_to_job(id):
     return Response.execute(JobService.delete_apply_to_job, id, error_status_code=400)

@@ -10,7 +10,7 @@ class PersonAddress:
     def serialize(self):
         return {
             'id': self.id,
-            'person_id': self.id,
+            'personId': self.id,
             'address': self.address,
             'number': self.number,
             'cep': self.cep,

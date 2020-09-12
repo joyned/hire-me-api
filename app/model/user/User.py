@@ -10,5 +10,5 @@ class User:
             'id': self.id,
             'email': self.email,
             'password': self.password,
-            'user_profile_id': self.user_profile_id
+            'userProfileId': self.user_profile_id
         }

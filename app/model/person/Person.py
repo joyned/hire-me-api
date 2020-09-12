@@ -20,7 +20,6 @@ class Person:
     def serialize(self):
         return {
             'id': self.id,
-            'user_id': self.user.id,
             'name': self.name,
             'fullname': self.fullname,
             'cpf': self.cpf,
@@ -30,6 +29,6 @@ class Person:
             'state': self.state,
             'country': self.country,
             'photo': self.photo,
-            'person_addres': self.person_addres.serialize(),
+            'personAddress': self.person_addres.serialize(),
             'user': self.user.serialize()
         }

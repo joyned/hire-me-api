@@ -9,6 +9,7 @@ class Job:
         self.description = ""
         self.id_area = 0
         self.id_job_level = 0
+        self.job_benefits = []
 
     def serialize(self):
         return {
@@ -19,7 +20,8 @@ class Job:
             'country': self.country,
             'salary': self.salary,
             'description': self.description,
-            'id_area': self.id_area,
-            'id_job_level': self.id_job_level
+            'areaId': self.id_area,
+            'jobLevelId': self.id_job_level,
+            'jobBenefits': self.job_benefits
         }
 
