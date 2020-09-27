@@ -51,3 +51,15 @@ def get_applied_jobs():
 @token_validator(request)
 def delete_apply_to_job(id):
     return Response.execute(JobService.delete_apply_to_job, id, error_status_code=400)
+
+
+@job_rest.route('/api/job/jobs-by-user', methods=['GET'])
+@token_validator(request)
+def get_jobs_by_user_id():
+    return Response.execute(JobService.get_jobs_by_user_id, request, error_status_code=401)
+
+
+@job_rest.route('/api/job/applied-jobs/chart/30-days', methods=['GET'])
+@token_validator(request)
+def get_data_to_chart_from_30_days():
+    return Response.execute(JobService.get_data_to_chart_from_30_days, request, error_status_code=401)

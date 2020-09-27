@@ -2,6 +2,7 @@ from flask import jsonify, request
 
 import app.repository.job.JobRepository as JobRepository
 from app.model.context.HireMeContext import HireMeContext
+from app.model.job.JobChart import JobChart
 from app.model.job.JobFilter import JobFilter
 from app.model.job.Job import Job
 from app.model.job.JobBenefit import JobBenefit
@@ -22,6 +23,7 @@ def get_all_jobs():
         job.state = row[3]
         job.country = row[4]
         job.description = row[5]
+        job.company = row[6]
         job_list.append(job.serialize())
     return job_list
 
@@ -59,6 +61,7 @@ def get_details(id):
     job.country = result[4]
     job.salary = result[5]
     job.description = result[6]
+    job.company = result[7]
 
     for row in JobRepository.get_job_benefits(job.id):
         job_benefit = JobBenefit()
@@ -89,7 +92,7 @@ def check_if_person_are_applied_to_job(job_id):
 
     if result is None:
         return False
-    
+
     return True
 
 
@@ -117,3 +120,38 @@ def delete_apply_to_job(job_id):
 
     JobRepository.delete_apply_to_job(context.person_id, job_id)
     return Response.ok({'message': 'Deleted successfully.'})
+
+
+def get_jobs_by_user_id(request):
+    context = HireMeContext()
+    context.build(request)
+
+    jobs = []
+
+    for row in JobRepository.get_jobs_by_user_id(context.user_id):
+        job = Job()
+        job.id = row[0]
+        job.title = row[1]
+        if row[2] == 'T':
+            job.status = True
+        else:
+            job.status = False
+        jobs.append(job.serialize())
+
+    return jobs
+
+
+def get_data_to_chart_from_30_days(request):
+    context = HireMeContext()
+    context.build(request)
+
+    job_chart = []
+
+    for row in JobRepository.get_data_to_chart_from_x_days(31, context.company_id):
+        chart = JobChart()
+        chart.total = row[0]
+        chart.date = row[1]
+        chart.company_id = row[2]
+        job_chart.append(chart.serialize())
+
+    return job_chart

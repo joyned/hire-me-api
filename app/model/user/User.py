@@ -4,11 +4,13 @@ class User:
         self.email = ""
         self.password = ""
         self.user_profile_id = 0
+        self.company_id = 0
 
     def serialize(self):
         return {
             'id': self.id,
             'email': self.email,
             'password': self.password,
-            'userProfileId': self.user_profile_id
+            'userProfileId': self.user_profile_id,
+            'companyId': self.company_id
         }

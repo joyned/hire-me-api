@@ -8,7 +8,8 @@ def get_user_by_email(email):
                 Usuario.Senha,
                 Usuario.Id_Perfil_Usuario,
                 Pessoa.Nome, 
-                Pessoa.Id 'Id_Pessoa'
+                Pessoa.Id 'Id_Pessoa',
+                Usuario.Id_Empresa
         FROM    Usuario
             JOIN Pessoa 
                 ON Pessoa.Id_Usuario = Usuario.Id

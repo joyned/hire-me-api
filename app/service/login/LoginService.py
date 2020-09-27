@@ -31,6 +31,7 @@ def validate_email(email, pwd):
         person.user.user_profile_id = result[3]
         person.name = result[4]
         person.id = result[5]
+        person.user.company_id = result[6]
 
         if check_password_hash(person.user.password, pwd):
             token = jwt.encode({
@@ -38,6 +39,7 @@ def validate_email(email, pwd):
                 'user_id': person.user.id,
                 'person_id': person.id,
                 'person_name': person.name,
+                'company_id': person.user.company_id,
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=100000)
             }, app_config['config']['key'])
             pages = PageService.get_pages(person.user.user_profile_id)

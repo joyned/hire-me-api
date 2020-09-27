@@ -3,13 +3,17 @@ from app.database import database as db
 
 def get_jobs():
     sql = """
-        SELECT Id,
-               Nome,
-               Cidade,
-               Estado,
-               Pais,
-               Descricao
-        FROM   Vaga
+        SELECT  Vaga.Id,
+                Vaga.Nome,
+                Vaga.Cidade,
+                Vaga.Estado,
+                Vaga.Pais,
+                Vaga.Descricao,
+                Empresa.Nome
+        FROM    Vaga
+        JOIN Empresa
+        ON Empresa.Id = Vaga.Id_Empresa
+        WHERE Vaga.Status = 'T'
     """
     return db.execute_query_fetchall(sql, None)
 
@@ -24,7 +28,7 @@ def filter_jobs(job_filter):
                    Pais,
                    Descricao
             FROM   Vaga
-            WHERE 1 = 1
+            WHERE Vaga.Status = 'T'
         """
 
     if job_filter.job is not None:
@@ -48,15 +52,19 @@ def filter_jobs(job_filter):
 
 def get_job_by_id(id):
     sql = """
-        SELECT Id,
-               Nome,
-               Cidade,
-               Estado,
-               Pais,
-               Salario,
-               Descricao
-        FROM   Vaga
-        WHERE  Id = %d
+        SELECT  Vaga.Id,
+                Vaga.Nome,
+                Vaga.Cidade,
+                Vaga.Estado,
+                Vaga.Pais,
+                Vaga.Salario,
+                Vaga.Descricao,
+                Empresa.Nome
+        FROM    Vaga
+        JOIN Empresa
+        ON Empresa.Id = Vaga.Id_Empresa
+        WHERE Vaga.Id = %d
+        AND Vaga.Status = 'T'
     """
     param = (id)
     return db.execute_query_fetchone(sql, param)
@@ -101,6 +109,7 @@ def get_applied_jobs(person_id):
     JOIN VagasAplicadas
     ON VagasAplicadas.Id_Vaga = Vaga.Id
     AND VagasAplicadas.Id_Pessoa = %d
+    WHERE Vaga.Status = 'T'
     """
     param = (person_id)
     return db.execute_query_fetchall(sql, param)
@@ -114,3 +123,35 @@ def delete_apply_to_job(person_id, job_id):
         """
     param = (job_id, person_id)
     db.execute_delete(sql, param)
+
+
+def get_jobs_by_user_id(user_id):
+    sql = """
+        SELECT  Id,
+                Nome,
+                Status
+        FROM Vaga 
+        WHERE Id_Usuario = %d
+    """
+
+    param = (user_id)
+    return db.execute_query_fetchall(sql, param)
+
+
+def get_data_to_chart_from_x_days(days, company_id):
+    sql = """
+    SELECT COUNT(*),
+           VagasAplicadas.Data_Aplicacao,
+           Vaga.Id_Empresa
+    FROM VagasAplicadas
+    JOIN Vaga
+    ON Vaga.Id = VagasAplicadas.Id_Vaga
+    WHERE Data_Aplicacao BETWEEN (GETDATE() - %d) AND (GETDATE())
+    AND Vaga.Id_Empresa = %d
+    GROUP BY VagasAplicadas.Data_Aplicacao,
+             Vaga.Id_Empresa
+    """
+
+    param = (days, company_id)
+
+    return db.execute_query_fetchall(sql, param)
