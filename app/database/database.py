@@ -75,7 +75,9 @@ def execute_insert(sql, param):
     cursor = conn.cursor()
     cursor.execute(sql, param)
     conn.commit()
+    last_row_id = cursor.lastrowid
     conn.close()
+    return last_row_id
 
 
 def execute_delete(sql, param):

@@ -17,3 +17,9 @@ def get_pages():
 @token_validator(request)
 def check_permisson():
     return Response.execute(PageService.check_permisson, request, error_status_code=403)
+
+
+@page_rest.route('/api/page-register', methods=['POST'])
+@token_validator(request)
+def register_page():
+    return Response.execute(PageService.register_page, request, error_status_code=403)

@@ -29,3 +29,28 @@ def check_permission(user_profile_id, page_id):
     """
     param = (user_profile_id, page_id)
     return db.execute_query_fetchone(sql, param)
+
+
+def insert_new_page(data):
+    sql = """
+        INSERT INTO Pagina (Constante, Ativo) VALUES (%s, %s)
+    """
+    param = (data.get('pageURL'), 'T')
+    page_id = db.execute_insert(sql, param)
+
+    sql = """
+        INSERT INTO PaginaInf (Id_Pagina, Idioma, Nome) VALUES (%s, %s, %s)
+    """
+    param = (page_id, 'pt', data.get('pageName'))
+    db.execute_insert(sql, param)
+
+    return page_id
+
+
+def insert_page_permission(page_id, user_profile_id):
+    sql = """
+        INSERT INTO PerfilUsuarioPermissaoPagina (Id_Pagina, Id_Perfil_Usuario, Permissao)
+        VALUES (%d, %d, %s)
+    """
+    param = (page_id, user_profile_id, 'T')
+    db.execute_insert(sql, param)
