@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify
 
 import app.repository.job.JobRepository as JobRepository
 from app.model.context.HireMeContext import HireMeContext
@@ -9,8 +9,38 @@ from app.model.job.JobBenefit import JobBenefit
 from app.utils.response import Response
 
 
-def save_new_job():
-    return jsonify("working!")
+def save_job(request):
+    context = HireMeContext()
+    context.build(request)
+
+    data = request.get_json()
+
+    job = Job()
+    job.title = data.get('title')
+    job.city = data.get('city')
+    job.state = data.get('state')
+    job.description = data.get('description')
+    job.salary = data.get('salary')
+
+    for benefit in data.get('jobBenefits'):
+        job_benefit = JobBenefit()
+        values_view = benefit.values()
+        value_iterator = iter(values_view)
+        first_value = next(value_iterator)
+        job_benefit.benefit = first_value
+        job.job_benefits.append(job_benefit)
+
+    job.company = context.company_id
+    job.user_id = context.user_id
+
+    if not data.get('id') == 0:
+        job.id = data.get('id')
+        JobRepository.delete_job_benefits(job.id)
+        JobRepository.update_job(job)
+    else:
+        job.id = JobRepository.save_new_job(job)
+
+    JobRepository.save_job_benefits(job)
 
 
 def get_all_jobs():
@@ -28,7 +58,7 @@ def get_all_jobs():
     return job_list
 
 
-def filter_jobs():
+def filter_jobs(request):
     data = request.get_json()
 
     job_filter = JobFilter()
@@ -73,7 +103,7 @@ def get_details(id):
 
 
 # TODO: REVIEW THE RETURN
-def apply_job():
+def apply_job(request):
     context = HireMeContext()
     context.build(request)
 
@@ -84,7 +114,7 @@ def apply_job():
     return {'message': 'Applied successfully.'}
 
 
-def check_if_person_are_applied_to_job(job_id):
+def check_if_person_can_apply(job_id, request):
     context = HireMeContext()
     context.build(request)
 
@@ -92,11 +122,10 @@ def check_if_person_are_applied_to_job(job_id):
 
     if result is None:
         return False
-
     return True
 
 
-def get_applied_jobs():
+def get_applied_jobs(request):
     context = HireMeContext()
     context.build(request)
 
@@ -114,7 +143,7 @@ def get_applied_jobs():
 
 # TODO: THIS METHOD NEEDS TO BE REVIEWED, IS NOT GOOD DELETE SOMETHING FROM DATABASE, NEED TO CONSIDER CREATE A FLAG
 #  TO SET INACTIVE. IT NEEDS TO REVIEW THE RETURN TOO.
-def delete_apply_to_job(job_id):
+def delete_apply_to_job(job_id, request):
     context = HireMeContext()
     context.build(request)
 
@@ -155,3 +184,27 @@ def get_data_to_chart_from_30_days(request):
         job_chart.append(chart.serialize())
 
     return job_chart
+
+
+def get_candidates_by_job_id(job_id):
+    candidates = []
+    for row in JobRepository.get_candidates_by_job_id(job_id):
+        candidates.append({
+            'candidateName': row[0],
+            'applicationDate': row[1]
+        })
+    return candidates
+
+
+def change_job_status(request):
+    data = request.get_json()
+
+    status = data.get('status')
+    job_id = data.get('jobId')
+
+    if status:
+        status = 'T'
+    else:
+        status = 'F'
+
+    JobRepository.change_job_status(status, job_id)

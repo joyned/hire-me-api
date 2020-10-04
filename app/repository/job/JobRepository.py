@@ -1,6 +1,54 @@
 from app.database import database as db
 
 
+def save_new_job(job):
+    sql = """
+        INSERT INTO Vaga (Nome, Cidade, Estado, Salario, Descricao, Id_Empresa, Id_Usuario, Status)
+            VALUES (%s, %s, %s, %d, %s, %d, %d, %s)
+    """
+
+    param = (job.title, job.city, job.state, job.salary, job.description, job.company, job.user_id, 'T')
+
+    return db.execute_insert(sql, param)
+
+
+def save_job_benefits(job):
+    for benefit in job.job_benefits:
+        sql = """
+            INSERT INTO VagaBeneficios (Id_Vaga, Beneficio)
+                VALUES (%d, %s)
+        """
+
+        param = (job.id, benefit.benefit)
+
+        db.execute_insert(sql, param)
+
+
+def update_job(job):
+    sql = """
+     UPDATE Vaga SET
+        Nome = %s,
+        Cidade = %s,
+        Estado = %s,
+        Salario = %d,
+        Descricao = %s
+    WHERE Id = %d
+    """
+
+    param = (job.title, job.city, job.state, job.salary, job.description, job.id)
+    db.execute_insert(sql, param)
+
+
+def delete_job_benefits(job_id):
+    sql = """
+        DELETE FROM VagaBeneficios WHERE Id_Vaga = %d
+    """
+
+    param = (job_id)
+
+    db.execute_delete(sql, param)
+
+
 def get_jobs():
     sql = """
         SELECT  Vaga.Id,
@@ -155,3 +203,29 @@ def get_data_to_chart_from_x_days(days, company_id):
     param = (days, company_id)
 
     return db.execute_query_fetchall(sql, param)
+
+
+def get_candidates_by_job_id(job_id):
+    sql = """
+        SELECT  Pessoa.Nome,
+                VagasAplicadas.Data_Aplicacao
+        FROM    VagasAplicadas
+        JOIN Pessoa
+        ON Pessoa.Id = VagasAplicadas.Id_Pessoa
+        WHERE VagasAplicadas.Id_Vaga = %d
+    """
+
+    param = (job_id)
+
+    return db.execute_query_fetchall(sql, param)
+
+
+def change_job_status(status, job_id):
+    sql = """
+        UPDATE Vaga
+            SET Status = %s
+        WHERE Id = %d
+    """
+
+    param = (status, job_id)
+    db.execute_insert(sql, param)

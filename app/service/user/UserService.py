@@ -1,4 +1,4 @@
-from app.model.context import HireMeContext
+from app.model.context.HireMeContext import HireMeContext
 from app.repository.user import UserRepository
 
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -32,6 +32,10 @@ def change_user_password(request):
         raise Exception("Wrong password!")
 
 
+def check_if_person_is_company(request):
+    context = HireMeContext()
+    context.build(request)
 
-
-
+    if context.company_id != 0:
+        return True
+    return False

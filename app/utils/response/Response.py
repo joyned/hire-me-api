@@ -1,4 +1,5 @@
 from app.model.response.ResponseModel import ResponseModel
+import logging
 
 
 def ok(data):
@@ -21,4 +22,5 @@ def execute(func, *args, error_status_code):
     try:
         return ok(func(*args))
     except Exception as e:
+        logging.error(e)
         return fail(e), error_status_code
