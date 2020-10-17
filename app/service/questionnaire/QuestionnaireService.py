@@ -5,6 +5,18 @@ from app.model.questionnaire.QuestionnaireQuestionOption import QuestionnaireQue
 from app.repository.questionnaire import QuestionnaireRepository
 
 
+def questionnaire(request):
+    data = request.get_json()
+
+    questionnaire_id = data.get('id')
+
+    if questionnaire_id is None:
+        return {'questionnaire': int(create_questionnaire(request))}
+    else:
+        delete_questionnaire(questionnaire_id)
+        return {'questionnaire': int(create_questionnaire(request))}
+
+
 def create_questionnaire(request):
     data = request.get_json()
 
@@ -28,7 +40,24 @@ def create_questionnaire(request):
             question_option.option_title = option.get('optionTitle')
             questionnaire_question.questionnaire_question_options.append(question_option)
 
-    QuestionnaireRepository.create_questionnaire(context, questionnaire)
+    return QuestionnaireRepository.create_questionnaire(context, questionnaire)
+
+
+def delete_questionnaire(questionnaire_id):
+    if questionnaire_editable(questionnaire_id):
+        delete_options_by_questionnaire_id(questionnaire_id)
+        delete_question_by_questionnaire_id(questionnaire_id)
+        QuestionnaireRepository.delete_questionnaire(questionnaire_id)
+    else:
+        raise Exception('not.editable.questionnaire')
+
+
+def delete_question_by_questionnaire_id(questionnaire_id):
+    QuestionnaireRepository.delete_question_by_questionnaire_id(questionnaire_id)
+
+
+def delete_options_by_questionnaire_id(questionnaire_id):
+    QuestionnaireRepository.delete_option_by_questionnaire_id(questionnaire_id)
 
 
 def list_questionnaires_simple(request):
@@ -79,3 +108,11 @@ def get_questionnaire_for_view(request, questionnaire_id):
             question.questionnaire_question_options.append(option.serialize())
 
     return questionnaire.serialize()
+
+
+def questionnaire_editable(questionnaire_id):
+    result = QuestionnaireRepository.questionnaire_editable(questionnaire_id)
+    if result == 1:
+        return False
+    else:
+        return True

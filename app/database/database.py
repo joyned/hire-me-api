@@ -98,7 +98,8 @@ def execute_count_lines(sql, param):
         conn = create_local_connection()
     cursor = conn.cursor()
     cursor.execute(sql, param)
-    res = cursor.rowcount()
+    cursor.fetchall()
+    res = int(cursor.rowcount)
     conn.close()
     return res
 

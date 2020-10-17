@@ -7,10 +7,16 @@ from app.service.questionnaire import QuestionnaireService
 questionnaire_rest = Blueprint('questionnaire_rest', __name__)
 
 
-@questionnaire_rest.route('/api/questionnaire/create', methods=['POST'])
+@questionnaire_rest.route('/api/questionnaire', methods=['PUT'])
 @token_validator(request)
-def create_questionnaire():
-    return Response.execute(QuestionnaireService.create_questionnaire, request, error_status_code=400)
+def questionnaire():
+    return Response.execute(QuestionnaireService.questionnaire, request, error_status_code=400)
+
+
+@questionnaire_rest.route('/api/questionnaire/delete/<questionnaire_id>', methods=['DELETE'])
+@token_validator(request)
+def delete_questionnaire(questionnaire_id):
+    return Response.execute(QuestionnaireService.delete_questionnaire, questionnaire_id, error_status_code=400)
 
 
 @questionnaire_rest.route('/api/questionnaire/list/simple', methods=['GET'])
@@ -23,3 +29,8 @@ def list_questionnaires_simple():
 def get_questionnaire_for_view(questionnaire_id):
     return Response.execute(QuestionnaireService.get_questionnaire_for_view, request, questionnaire_id,
                             error_status_code=403)
+
+
+@questionnaire_rest.route('/api/questionnaire/editable/<questionnaire_id>', methods=['GET'])
+def questionnaire_editable(questionnaire_id):
+    return Response.execute(QuestionnaireService.questionnaire_editable, questionnaire_id, error_status_code=4000)

@@ -1,8 +1,5 @@
 from app.database import database as db
 from app.model.context.HireMeContext import HireMeContext
-from app.model.questionnaire.Questionnaire import Questionnaire
-from app.model.questionnaire.QuestionnaireQuestion import QuestionnaireQuestion
-from app.model.questionnaire.QuestionnaireQuestionOption import QuestionnaireQuestionOption
 
 
 def create_questionnaire(context: HireMeContext, questionnaire):
@@ -41,6 +38,46 @@ def create_questionnaire(context: HireMeContext, questionnaire):
                     param = (option.option_title, option.questionnaire_question_id)
 
                     db.execute_insert(sql, param)
+    return questionnaire.id
+
+
+def delete_questionnaire(questionnaire_id):
+    sql = """
+        DELETE FROM Questionario WHERE Id = %d
+    """
+
+    param = (questionnaire_id)
+
+    db.execute_delete(sql, param)
+
+
+def delete_question_by_questionnaire_id(questionnaire_id):
+    sql = """
+        DELETE FROM QuestionarioQuestao WHERE Id_Questionario = %d
+    """
+
+    param = (questionnaire_id)
+
+    db.execute_delete(sql, param)
+
+
+def delete_option_by_questionnaire_id(questionnaire_id):
+    sql = """
+        DELETE FROM QuestionarioQuestaoOpcao
+        WHERE Id IN (
+            SELECT  Id 
+            FROM    QuestionarioQuestaoOpcao 
+            WHERE Id_Questionario_Questao IN (
+                SELECT  Id 
+                FROM    QuestionarioQuestao 
+                WHERE Id_Questionario = %d
+            )
+        )
+    """
+
+    param = (questionnaire_id)
+
+    db.execute_delete(sql, param)
 
 
 def list_questionnaires_simple(context: HireMeContext):
@@ -100,3 +137,13 @@ def get_questionnaire_question_options_by_id(question_id):
     param = (question_id)
 
     return db.execute_query_fetchall(sql, param)
+
+
+def questionnaire_editable(questionnaire_id):
+    sql = """
+        SELECT 1 FROM EtapasProcessoSeletivo WHERE Id_Questionario = %d
+    """
+
+    param = (questionnaire_id)
+
+    return db.execute_count_lines(sql, param)
