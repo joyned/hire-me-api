@@ -1,4 +1,4 @@
-from app.database import database as db
+from app.database import Database as db
 from app.model.context.HireMeContext import HireMeContext
 
 

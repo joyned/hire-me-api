@@ -1,4 +1,4 @@
-from app.database import database as db
+from app.database import Database as db
 
 
 def register_new_user(user):

@@ -1,4 +1,4 @@
-from app.database import database as db
+from app.database import Database as db
 
 
 def get_all_pages_by_user_id(user_profile_id):

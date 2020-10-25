@@ -1,7 +1,21 @@
 from app.model.context.HireMeContext import HireMeContext
+from app.model.selectiveprocess.JobSelectiveProcess import JobSelectiveProcess
 from app.model.selectiveprocess.SelectiveProcess import SelectiveProcess
 from app.model.selectiveprocess.SelectiveProcessStep import SelectiveProcessStep
+from app.repository.job import JobRepository
 from app.repository.selectiveprocess import SelectiveProcessRepository
+from app.service.job import JobService
+
+
+def selective_process(request):
+    data = request.get_json()
+
+    selective_process_id = data.get('id')
+
+    if selective_process_id is not None:
+        delete_selective_process(selective_process_id)
+
+    return {'seletiveProcessId': int(create_selective_process(request))}
 
 
 def create_selective_process(request):
@@ -26,6 +40,16 @@ def create_selective_process(request):
         step.selective_process_id = selective_process.id
 
         SelectiveProcessRepository.create_selective_process_steps(step)
+
+    return selective_process.id
+
+
+def delete_selective_process(selective_process_id):
+    if selective_process_editable(selective_process_id):
+        SelectiveProcessRepository.delete_selective_process_steps(selective_process_id)
+        SelectiveProcessRepository.delete_seletive_process(selective_process_id)
+    else:
+        raise Exception('selective.process.not.deletable')
 
 
 def list_selective_process_simple(request):
@@ -69,3 +93,70 @@ def list_selective_process(request, selective_process_id):
     selective_process.steps = steps
 
     return selective_process.serialize()
+
+
+def selective_process_editable(selective_process_id):
+    result = SelectiveProcessRepository.selective_process_editable(selective_process_id)
+    return result == 0
+
+
+def get_selective_process_by_job_id(request, job_id):
+    context = HireMeContext()
+    context.build(request)
+
+    job_selective_processes = []
+
+    for row in SelectiveProcessRepository.get_selective_process_by_job_id(context.person_id, job_id):
+        job_selective_process = JobSelectiveProcess()
+        job_selective_process.step_title = row[0]
+        job_selective_process.step_description = row[1]
+        job_selective_process.step_type = row[2]
+        job_selective_process.questionnaire_id = row[3]
+        job_selective_process.order = row[4]
+        job_selective_process.status = row[5]
+
+        job_selective_processes.append(job_selective_process.serialize())
+
+    return {
+        'jobTitle': JobService.get_job_title_by_id(job_id),
+        'selectiveProcess': job_selective_processes
+    }
+
+
+def get_candidates(job_id):
+    candidates = []
+    for row in SelectiveProcessRepository.get_candidates(job_id):
+        candidates.append({
+            'candidateId': row[0],
+            'candidateName': row[1],
+            'applicationDate': row[2],
+            'status': row[3]
+        })
+
+    return {'jobTitle': JobService.get_job_title_by_id(job_id), 'candidates': candidates}
+
+
+def get_selective_process_by_job_and_candidate_id(request):
+    data = request.get_json()
+
+    person_id = data.get('personId')
+    job_id = data.get('jobId')
+
+    job_selective_processes = []
+
+    for row in SelectiveProcessRepository.get_selective_process_by_job_id(person_id, job_id):
+        job_selective_process = JobSelectiveProcess()
+        job_selective_process.step_title = row[0]
+        job_selective_process.step_description = row[1]
+        job_selective_process.step_type = row[2]
+        job_selective_process.questionnaire_id = row[3]
+        job_selective_process.order = row[4]
+        job_selective_process.status = row[5]
+        job_selective_process.id = row[6]
+
+        job_selective_processes.append(job_selective_process.serialize())
+
+    return {
+        'jobTitle': JobService.get_job_title_by_id(job_id),
+        'selectiveProcess': job_selective_processes
+    }

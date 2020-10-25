@@ -21,6 +21,7 @@ def save_job(request):
     job.state = data.get('state')
     job.description = data.get('description')
     job.salary = data.get('salary')
+    job.selective_process_id = data.get('selectiveProcessId')
 
     for benefit in data.get('jobBenefits'):
         job_benefit = JobBenefit()
@@ -92,6 +93,7 @@ def get_details(id):
     job.salary = result[5]
     job.description = result[6]
     job.company = result[7]
+    job.selective_process_id = result[8]
 
     for row in JobRepository.get_job_benefits(job.id):
         job_benefit = JobBenefit()
@@ -102,16 +104,22 @@ def get_details(id):
     return job.serialize()
 
 
-# TODO: REVIEW THE RETURN
 def apply_job(request):
     context = HireMeContext()
     context.build(request)
 
     data = request.get_json()
-    job = data['jobId']
+    job_id = data['jobId']
 
-    JobRepository.apply_to_job(context.person_id, job)
-    return {'message': 'Applied successfully.'}
+    try:
+        JobRepository.apply_to_job(context.person_id, job_id)
+
+        first_process_step = JobRepository.check_first_seletive_process_step_by_job_id(job_id)
+
+        JobRepository.insert_first_step(context, job_id, first_process_step)
+        return {'message': 'successful.apply'}
+    except Exception as e:
+        return {'message': 'fail.apply'}
 
 
 def check_if_person_can_apply(job_id, request):
@@ -121,8 +129,8 @@ def check_if_person_can_apply(job_id, request):
     result = JobRepository.check_if_person_are_applied_to_job(context.person_id, job_id)
 
     if result is None:
-        return False
-    return True
+        return True
+    return False
 
 
 def get_applied_jobs(request):
@@ -137,6 +145,7 @@ def get_applied_jobs(request):
         job.city = row[2]
         job.state = row[3]
         job.country = row[4]
+        job.description = row[5]
         job_list.append(job.serialize())
     return job_list
 
@@ -193,7 +202,7 @@ def get_candidates_by_job_id(job_id):
             'candidateName': row[0],
             'applicationDate': row[1]
         })
-    return candidates
+    return {'jobTitle': get_job_title_by_id(job_id), 'candidates': candidates}
 
 
 def change_job_status(request):
@@ -208,3 +217,7 @@ def change_job_status(request):
         status = 'F'
 
     JobRepository.change_job_status(status, job_id)
+
+
+def get_job_title_by_id(job_id):
+    return JobRepository.get_job_title_by_id(job_id)[0]

@@ -11,6 +11,7 @@ class Job:
         self.company = ""
         self.status = ""
         self.user_id = ""
+        self.selective_process_id = None
 
     def serialize(self):
         return {
@@ -24,6 +25,7 @@ class Job:
             'jobBenefits': self.job_benefits,
             'company': self.company,
             'status': self.status,
-            'userId': self.user_id
+            'userId': self.user_id,
+            'selectiveProcessId': self.selective_process_id
         }
 

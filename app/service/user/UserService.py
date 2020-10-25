@@ -36,6 +36,6 @@ def check_if_person_is_company(request):
     context = HireMeContext()
     context.build(request)
 
-    if context.company_id != 0:
+    if context.company_id is not None:
         return True
     return False

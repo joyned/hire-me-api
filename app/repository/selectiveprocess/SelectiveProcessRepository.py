@@ -1,4 +1,4 @@
-import app.database.database as db
+import app.database.Database as db
 from app.model.context.HireMeContext import HireMeContext
 from app.model.selectiveprocess import SelectiveProcess
 from app.model.selectiveprocess.SelectiveProcessStep import SelectiveProcessStep
@@ -23,7 +23,27 @@ def create_selective_process_steps(step: SelectiveProcessStep):
 
     param = (step.step_title, step.step_description, step.step_type, step.questionnaire_id, step.selective_process_id)
 
-    db.execute_insert(sql, param)
+    return db.execute_insert(sql, param)
+
+
+def delete_seletive_process(selective_process_id):
+    sql = """
+        DELETE FROM ProcessoSeletivo WHERE Id = %d
+    """
+
+    param = (selective_process_id)
+
+    db.execute_delete(sql, param)
+
+
+def delete_selective_process_steps(selective_process_id):
+    sql = """
+        DELETE FROM EtapasProcessoSeletivo WHERE Id_Processo_Seletivo = %d
+    """
+
+    param = (selective_process_id)
+
+    db.execute_delete(sql, param)
 
 
 def list_selective_process_common_sql():
@@ -63,9 +83,68 @@ def list_selective_process_step(selective_process_id):
                 Id_Questionario,
                 Id_Processo_Seletivo
         FROM    EtapasProcessoSeletivo
-        WHERE   Id_Processo_Seletivo = 2
+        WHERE   Id_Processo_Seletivo = %d
     """
 
     param = (selective_process_id)
+
+    return db.execute_query_fetchall(sql, param)
+
+
+def selective_process_editable(selective_process_id):
+    sql = """
+        SELECT 1
+        FROM Vaga 
+        WHERE Id_Processo_Seletivo = %d
+    """
+
+    param = (selective_process_id)
+
+    return db.execute_count_lines(sql, param)
+
+
+def get_selective_process_by_job_id(person_id, job_id):
+    sql = """
+        SELECT  EtapasProcessoSeletivo.Titulo_Etapa,
+                EtapasProcessoSeletivo.Descricao_Etapa,
+                EtapasProcessoSeletivo.Tipo_Etapa,
+                EtapasProcessoSeletivo.Id_Questionario,
+                EtapasProcessoSeletivo.Ordem,
+                ProcessoSeletivoAprovacao.Status,
+                ProcessoSeletivoAprovacao.Id
+        FROM    EtapasProcessoSeletivo
+        LEFT JOIN ProcessoSeletivoAprovacao
+        ON ProcessoSeletivoAprovacao.Id_Etapa = EtapasProcessoSeletivo.Id
+        AND ProcessoSeletivoAprovacao.Id_Pessoa = %d
+        WHERE EtapasProcessoSeletivo.Id_Processo_Seletivo = (
+            SELECT  Vaga.Id_Processo_Seletivo
+            FROM    Vaga
+            WHERE   Vaga.Id = %d
+        )
+        ORDER BY EtapasProcessoSeletivo.Ordem
+    """
+
+    param = (person_id, job_id)
+
+    return db.execute_query_fetchall(sql, param)
+
+
+def get_candidates(job_id):
+    sql = """
+        SELECT  Pessoa.Id,
+                Pessoa.Nome,
+                VagasAplicadas.Data_Aplicacao,
+                ProcessoSeletivoAprovacao.[Status]
+        FROM    VagasAplicadas
+        JOIN Pessoa
+        ON Pessoa.Id = VagasAplicadas.Id_Pessoa
+        JOIN ProcessoSeletivoAprovacao
+        ON ProcessoSeletivoAprovacao.Id_Vaga = %d
+        AND ProcessoSeletivoAprovacao.Id_Pessoa = Pessoa.Id
+        WHERE VagasAplicadas.Id_Vaga = %d
+        ORDER BY Nome
+    """
+
+    param = (job_id, job_id)
 
     return db.execute_query_fetchall(sql, param)

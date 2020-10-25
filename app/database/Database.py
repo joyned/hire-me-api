@@ -76,8 +76,13 @@ def execute_insert(sql, param):
     cursor.execute(sql, param)
     conn.commit()
     last_row_id = cursor.lastrowid
+    conn.rollback()
     conn.close()
     return last_row_id
+
+
+def execute_update(sql, param):
+    execute_insert(sql, param)
 
 
 def execute_delete(sql, param):
