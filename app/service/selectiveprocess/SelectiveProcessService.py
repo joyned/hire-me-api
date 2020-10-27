@@ -2,9 +2,9 @@ from app.model.context.HireMeContext import HireMeContext
 from app.model.selectiveprocess.JobSelectiveProcess import JobSelectiveProcess
 from app.model.selectiveprocess.SelectiveProcess import SelectiveProcess
 from app.model.selectiveprocess.SelectiveProcessStep import SelectiveProcessStep
-from app.repository.job import JobRepository
 from app.repository.selectiveprocess import SelectiveProcessRepository
 from app.service.job import JobService
+from app.service.selectiveprocessapproval import ApprovalSelectiveProcessService
 
 
 def selective_process(request):
@@ -114,6 +114,7 @@ def get_selective_process_by_job_id(request, job_id):
         job_selective_process.questionnaire_id = row[3]
         job_selective_process.order = row[4]
         job_selective_process.status = row[5]
+        job_selective_process.id = row[6]
 
         job_selective_processes.append(job_selective_process.serialize())
 
@@ -153,6 +154,8 @@ def get_selective_process_by_job_and_candidate_id(request):
         job_selective_process.order = row[4]
         job_selective_process.status = row[5]
         job_selective_process.id = row[6]
+
+        job_selective_process.can_approve = ApprovalSelectiveProcessService.can_approve(job_selective_process.id)
 
         job_selective_processes.append(job_selective_process.serialize())
 

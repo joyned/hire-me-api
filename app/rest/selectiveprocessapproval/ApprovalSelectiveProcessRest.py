@@ -17,3 +17,9 @@ def approve(approved_step_id):
 @token_validator(request)
 def reject(approved_step_id):
     return Response.execute(ApprovalSelectiveProcessService.reject, approved_step_id, error_status_code=403)
+
+
+@approval_selective_process_rest.route('/api/approval/selective/process/canApprove/<approved_step_id>', methods=['GET'])
+@token_validator(request)
+def can_approve(approved_step_id):
+    return Response.execute(ApprovalSelectiveProcessService.can_approve, approved_step_id, error_status_code=403)

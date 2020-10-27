@@ -7,6 +7,9 @@ class QuestionnaireQuestion:
         self.answer_type = ''
         self.answer_time = None
         self.questionnaire_question_options = []
+        self.questionnaire_answer = None
+        self.answer_id = None
+        self.questionnaire_correct = None
 
     def serialize(self):
         return {
@@ -16,5 +19,8 @@ class QuestionnaireQuestion:
             'questionHelp': self.question_help,
             'answerType': self.answer_type,
             'answerTime': self.answer_time,
-            'questionnaireQuestionOption': self.questionnaire_question_options
+            'questionnaireQuestionOption': self.questionnaire_question_options,
+            'questionnaireAnswer': self.questionnaire_answer,
+            'answerId': self.answer_id,
+            'questionnaireCorrect': self.questionnaire_correct
         }

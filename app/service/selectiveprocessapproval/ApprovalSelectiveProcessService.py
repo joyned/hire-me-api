@@ -9,7 +9,9 @@ def approve(request, approved_step_id):
     next_step_id = get_next_step_by_current_step(approved_step_id)
 
     ApprovalSelectiveProcessRepository.change_status_to_approved(approved_step_id)
-    ApprovalSelectiveProcessRepository.insert_new_step(next_step_id, approved_step_id)
+
+    if next_step_id is not None:
+        ApprovalSelectiveProcessRepository.insert_new_step(next_step_id, approved_step_id)
 
 
 def get_next_step_by_current_step(approved_step_id):
@@ -22,3 +24,7 @@ def has_more_steps(approved_step_id):
 
 def reject(approved_step_id):
     ApprovalSelectiveProcessRepository.reject(approved_step_id)
+
+
+def can_approve(approved_step_id):
+    return ApprovalSelectiveProcessRepository.can_approve(approved_step_id) is not None

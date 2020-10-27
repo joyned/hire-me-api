@@ -115,6 +115,7 @@ def get_selective_process_by_job_id(person_id, job_id):
         FROM    EtapasProcessoSeletivo
         LEFT JOIN ProcessoSeletivoAprovacao
         ON ProcessoSeletivoAprovacao.Id_Etapa = EtapasProcessoSeletivo.Id
+        AND ProcessoSeletivoAprovacao.Id_Vaga = %d
         AND ProcessoSeletivoAprovacao.Id_Pessoa = %d
         WHERE EtapasProcessoSeletivo.Id_Processo_Seletivo = (
             SELECT  Vaga.Id_Processo_Seletivo
@@ -124,7 +125,7 @@ def get_selective_process_by_job_id(person_id, job_id):
         ORDER BY EtapasProcessoSeletivo.Ordem
     """
 
-    param = (person_id, job_id)
+    param = (job_id, person_id, job_id)
 
     return db.execute_query_fetchall(sql, param)
 
@@ -134,14 +135,21 @@ def get_candidates(job_id):
         SELECT  Pessoa.Id,
                 Pessoa.Nome,
                 VagasAplicadas.Data_Aplicacao,
-                ProcessoSeletivoAprovacao.[Status]
+                ProcessoSeletivoAprovacao.[Status],
+                MAX(ProcessoSeletivoAprovacao.Data_Aprovacao)
         FROM    VagasAplicadas
-        JOIN Pessoa
+        INNER JOIN Pessoa
         ON Pessoa.Id = VagasAplicadas.Id_Pessoa
-        JOIN ProcessoSeletivoAprovacao
+        INNER JOIN ProcessoSeletivoAprovacao
         ON ProcessoSeletivoAprovacao.Id_Vaga = %d
         AND ProcessoSeletivoAprovacao.Id_Pessoa = Pessoa.Id
         WHERE VagasAplicadas.Id_Vaga = %d
+        AND ProcessoSeletivoAprovacao.Id IN (
+            SELECT MAX(id) 
+            FROM   ProcessoSeletivoAprovacao
+            GROUP BY Id_Vaga, Id_Pessoa, Id_Processo_Seletivo
+        )
+        GROUP BY Pessoa.Id, Pessoa.Nome, VagasAplicadas.Data_Aplicacao, ProcessoSeletivoAprovacao.[Status]
         ORDER BY Nome
     """
 

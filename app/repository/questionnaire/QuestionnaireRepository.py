@@ -95,33 +95,72 @@ def list_questionnaires_simple(context: HireMeContext):
     return db.execute_query_fetchall(sql, param)
 
 
-def get_questionnaire_by_id(context: HireMeContext, questionnaire_id):
+def get_questionnaire_by_id(context: HireMeContext, questionnaire_id, for_view):
     sql = """
         SELECT  Titulo_Questionario,
                 Id_Empresa,
                 Id_Usuario
         FROM Questionario
         WHERE Id = %d
-        AND Id_Empresa = %d
-        AND Id_Usuario = %d
     """
-
-    param = (questionnaire_id, context.company_id, context.user_id)
+    if for_view:
+        sql += """
+            AND Id_Empresa = %d
+            AND Id_Usuario = %d
+        """
+        param = (questionnaire_id, context.company_id, context.user_id)
+    else:
+        param = (questionnaire_id)
 
     return db.execute_query_fetchone(sql, param)
 
 
 def get_questionnaire_question_by_id(questionnaire_id):
     sql = """
-        SELECT  Id,
-                Titulo_Questao,
-                Titulo_Ajuda,
-                Tipo_Resposta
+        SELECT  QuestionarioQuestao.Id,
+                QuestionarioQuestao.Titulo_Questao,
+                QuestionarioQuestao.Titulo_Ajuda,
+                QuestionarioQuestao.Tipo_Resposta,
+                QuestionarioQuestaoResposta.Resposta
         FROM QuestionarioQuestao
-        WHERE Id_Questionario = %d
+        LEFT JOIN QuestionarioQuestaoResposta
+        ON QuestionarioQuestaoResposta.Id_Questao = QuestionarioQuestao.Id
+        WHERE QuestionarioQuestao.Id_Questionario = %d
     """
 
     param = (questionnaire_id)
+
+    return db.execute_query_fetchall(sql, param)
+
+
+def get_questionnaire_by_job_id_and_person_id(job_id, person_id):
+    sql = """
+        SELECT  QuestionarioQuestao.Id,
+                QuestionarioQuestao.Titulo_Questao,
+                QuestionarioQuestao.Titulo_Ajuda,
+                QuestionarioQuestao.Tipo_Resposta,
+                QuestionarioQuestaoResposta.Resposta,
+                QuestionarioQuestaoResposta.Id Id_Resposta,
+                QuestionarioQuestaoRespostaCorrecao.Correto
+        FROM QuestionarioQuestao
+        INNER JOIN QuestionarioQuestaoResposta
+        ON QuestionarioQuestaoResposta.Id_Questao = QuestionarioQuestao.Id
+        INNER JOIN (
+            SELECT  EtapasProcessoSeletivo.Id_Questionario,
+                    ProcessoSeletivoAprovacao.Id Id_Processo_Aprovacao
+            FROM    EtapasProcessoSeletivo
+            JOIN ProcessoSeletivoAprovacao
+            ON ProcessoSeletivoAprovacao.Id_Etapa = EtapasProcessoSeletivo.Id
+            AND ProcessoSeletivoAprovacao.Id_Vaga = %d
+            AND ProcessoSeletivoAprovacao.Id_Pessoa = %d
+        ) AS QuestionarioProcesoAprovacao
+        ON QuestionarioProcesoAprovacao.Id_Questionario = QuestionarioQuestao.Id_Questionario
+        AND QuestionarioQuestaoResposta.Id_Processo_Aprovacao = QuestionarioProcesoAprovacao.Id_Processo_Aprovacao
+        INNER JOIN QuestionarioQuestaoRespostaCorrecao
+        ON QuestionarioQuestaoRespostaCorrecao.Id_Resposta = QuestionarioQuestaoResposta.Id
+    """
+
+    param = (job_id, person_id)
 
     return db.execute_query_fetchall(sql, param)
 
@@ -147,3 +186,45 @@ def questionnaire_editable(questionnaire_id):
     param = (questionnaire_id)
 
     return db.execute_count_lines(sql, param)
+
+
+def answer_questionnaire(questionnaire_answer):
+    sql = """
+    INSERT INTO QuestionarioQuestaoResposta (Id_Processo_Aprovacao, Id_Questao, Resposta)
+        VALUES (%d, %d, %s)
+    """
+
+    param = (questionnaire_answer.get('process_approval_id'), questionnaire_answer.get('question_id'),
+             questionnaire_answer.get('answer'))
+
+    db.execute_insert(sql, param)
+
+
+def change_status_to_pending_approval(approval_id):
+    sql = """
+        UPDATE ProcessoSeletivoAprovacao SET [Status] = 'G' WHERE Id = %d
+    """
+
+    param = (approval_id)
+
+    db.execute_update(sql, param)
+
+
+def check_if_can_answer_questionnaire(approval_id):
+    sql = """
+        SELECT 1 FROM QuestionarioQuestaoResposta WHERE Id_Processo_Aprovacao = %d
+    """
+    param = (approval_id)
+
+    return db.execute_query_fetchone(sql, param)
+
+
+def correct_questionnaire(question_answer):
+    sql = """
+        INSERT INTO QuestionarioQuestaoRespostaCorrecao (Id_Resposta, Correto)
+            VALUES(%d, %s)
+    """
+
+    param = (question_answer.get('answerId'), question_answer.get('correct'))
+
+    db.execute_insert(sql, param)

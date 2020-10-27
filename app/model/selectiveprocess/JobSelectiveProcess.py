@@ -7,6 +7,7 @@ class JobSelectiveProcess:
         self.questionnaire_id = None
         self.order = None
         self.status = 'P'
+        self.can_approve = None
 
     def serialize(self):
         return {
@@ -16,5 +17,6 @@ class JobSelectiveProcess:
             'stepType': self.step_type,
             'questionnaireId': self.questionnaire_id,
             'order': self.order,
-            'status': self.status
+            'status': self.status,
+            'canApprove': self.can_approve
         }

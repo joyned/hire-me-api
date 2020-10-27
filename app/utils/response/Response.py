@@ -24,3 +24,11 @@ def execute(func, *args, error_status_code):
     except Exception as e:
         logging.error(e)
         return fail(e), error_status_code
+
+
+def ok_message(message):
+    return {'message': message}
+
+
+def fail_message(message):
+    return {'fail': message}
