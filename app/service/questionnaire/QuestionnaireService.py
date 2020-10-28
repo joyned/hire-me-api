@@ -79,7 +79,7 @@ def list_questionnaires_simple(request):
     return questionnaires
 
 
-def get_questionnaire(request, questionnaire_id, for_view):
+def get_questionnaire(request, questionnaire_id, approval_id, for_view):
     context = HireMeContext()
     context.build(request)
 
@@ -91,7 +91,7 @@ def get_questionnaire(request, questionnaire_id, for_view):
     questionnaire.company_id = result[1]
     questionnaire.user_id = result[2]
 
-    for row_question in QuestionnaireRepository.get_questionnaire_question_by_id(questionnaire.id):
+    for row_question in QuestionnaireRepository.get_questionnaire_question_by_id(questionnaire.id, approval_id):
         question = QuestionnaireQuestion()
         question.id = row_question[0]
         question.question_title = row_question[1]
@@ -112,12 +112,12 @@ def get_questionnaire(request, questionnaire_id, for_view):
     return questionnaire.serialize()
 
 
-def get_questionnaire_for_response(request, questionnaire_id):
-    return get_questionnaire(request, questionnaire_id, False)
+def get_questionnaire_for_response(request, questionnaire_id, approval_id):
+    return get_questionnaire(request, questionnaire_id, approval_id, False)
 
 
 def get_questionnaire_for_view(request, questionnaire_id):
-    return get_questionnaire(request, questionnaire_id, True)
+    return get_questionnaire(request, questionnaire_id, None, True)
 
 
 def get_questionnaire_by_job_id_and_person_id(request):

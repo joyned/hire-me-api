@@ -32,10 +32,10 @@ def get_questionnaire_for_view(questionnaire_id):
                             error_status_code=403)
 
 
-@questionnaire_rest.route('/api/questionnaire/get/response/<questionnaire_id>', methods=['GET'])
+@questionnaire_rest.route('/api/questionnaire/get/response/<questionnaire_id>/<approval_id>', methods=['GET'])
 @token_validator(request)
-def get_questionnaire_for_response(questionnaire_id):
-    return Response.execute(QuestionnaireService.get_questionnaire_for_response, request, questionnaire_id,
+def get_questionnaire_for_response(questionnaire_id, approval_id):
+    return Response.execute(QuestionnaireService.get_questionnaire_for_response, request, questionnaire_id, approval_id,
                             error_status_code=403)
 
 

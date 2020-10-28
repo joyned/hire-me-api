@@ -115,7 +115,7 @@ def get_questionnaire_by_id(context: HireMeContext, questionnaire_id, for_view):
     return db.execute_query_fetchone(sql, param)
 
 
-def get_questionnaire_question_by_id(questionnaire_id):
+def get_questionnaire_question_by_id(questionnaire_id, approval_id):
     sql = """
         SELECT  QuestionarioQuestao.Id,
                 QuestionarioQuestao.Titulo_Questao,
@@ -125,12 +125,17 @@ def get_questionnaire_question_by_id(questionnaire_id):
         FROM QuestionarioQuestao
         LEFT JOIN QuestionarioQuestaoResposta
         ON QuestionarioQuestaoResposta.Id_Questao = QuestionarioQuestao.Id
-        WHERE QuestionarioQuestao.Id_Questionario = %d
     """
 
-    param = (questionnaire_id)
-
-    return db.execute_query_fetchall(sql, param)
+    if approval_id is not None:
+        sql += " AND QuestionarioQuestaoResposta.Id_Processo_Aprovacao = %d "
+        sql += "        WHERE QuestionarioQuestao.Id_Questionario = %d"
+        param = (approval_id, questionnaire_id)
+        return db.execute_query_fetchall(sql, param)
+    else:
+        sql += "        WHERE QuestionarioQuestao.Id_Questionario = %d"
+        param = (questionnaire_id)
+        return db.execute_query_fetchall(sql, param)
 
 
 def get_questionnaire_by_job_id_and_person_id(job_id, person_id):
@@ -156,7 +161,7 @@ def get_questionnaire_by_job_id_and_person_id(job_id, person_id):
         ) AS QuestionarioProcesoAprovacao
         ON QuestionarioProcesoAprovacao.Id_Questionario = QuestionarioQuestao.Id_Questionario
         AND QuestionarioQuestaoResposta.Id_Processo_Aprovacao = QuestionarioProcesoAprovacao.Id_Processo_Aprovacao
-        INNER JOIN QuestionarioQuestaoRespostaCorrecao
+        LEFT JOIN QuestionarioQuestaoRespostaCorrecao
         ON QuestionarioQuestaoRespostaCorrecao.Id_Resposta = QuestionarioQuestaoResposta.Id
     """
 
