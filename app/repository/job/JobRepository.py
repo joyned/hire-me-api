@@ -63,9 +63,9 @@ def get_jobs():
         FROM    Vaga
         JOIN Empresa
         ON Empresa.Id = Vaga.Id_Empresa
-        WHERE Vaga.Status = 'T'
+        WHERE Vaga.Status = ?
     """
-    return db.execute_query_fetchall(sql, None)
+    return db.execute_query_fetchall(sql, 'T')
 
 
 def filter_jobs(job_filter):

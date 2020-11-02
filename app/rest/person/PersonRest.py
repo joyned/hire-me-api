@@ -1,5 +1,4 @@
 from flask import Blueprint, request
-from flask_cors import cross_origin
 
 from app.security.TokenValidator import token_validator
 from app.service.person import PersonService
@@ -10,14 +9,11 @@ person_rest = Blueprint('person_service', __name__)
 
 @person_rest.route('/api/person/get', methods=['GET'])
 @token_validator(request)
-@cross_origin()
 def get_person_details():
     return Response.execute(PersonService.get_person_details, request, error_status_code=404)
 
 
 @person_rest.route('/api/person/update', methods=['POST'])
 @token_validator(request)
-@cross_origin()
 def update_person_details():
     return Response.execute(PersonService.update_candidate_details, request, error_status_code=400)
-

@@ -48,4 +48,4 @@ def validate_email(email, pwd):
         else:
             raise Exception('Email and/or password are wrong.')
     else:
-        return {}
+        raise Exception('Email and/or password are wrong.')
