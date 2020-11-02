@@ -7,7 +7,7 @@ def register_new_user(user):
 
 def check_if_email_exists(email):
     sql = """
-    select 1 from Usuario where email = %s
+    select 1 from Usuario where email = ?
     """
 
     return db.execute_query_fetchone(sql, (email))

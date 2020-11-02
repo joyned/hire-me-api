@@ -47,3 +47,5 @@ def validate_email(email, pwd):
                     'time': datetime.datetime.utcnow(), 'token': token.decode('UTF-8'), 'pages': pages}
         else:
             raise Exception('Email and/or password are wrong.')
+    else:
+        return {}

@@ -1,4 +1,4 @@
-import pymssql
+import pyodbc
 
 from app.utils.resource import ResourceUtil
 
@@ -9,7 +9,8 @@ connection = {
     'host': db_properties['user']['host'],
     'username': db_properties['user']['username'],
     'password': db_properties['user']['password'],
-    'db': db_properties['user']['db']
+    'db': db_properties['user']['db'],
+    'driver': db_properties['user']['driver']
 }
 
 connection_local = {
@@ -36,12 +37,13 @@ def db_connection():
 
 
 def create_connection():
-    return pymssql.connect(connection['host'], connection['username'], connection['password'], connection['db'])
+    # return pymssql.connect(connection['host'], 1433, connection['username'], connection['password'], connection['db'])
+    return pyodbc.connect('DRIVER=' + connection['driver'] + ';SERVER=' + connection['host'] + ';PORT=1433;DATABASE=' + connection['db'] + ';UID=' + connection['username'] + ';PWD=' + connection['password'])
 
 
 def create_local_connection():
-    return pymssql.connect(connection_local['host'], connection_local['username'], connection_local['password'],
-                           connection_local['db'])
+    # return pymssql.connect(connection_local['host'], connection_local['username'], connection_local['password'], connection_local['db'])
+    return 0
 
 
 def execute_query_fetchall(sql, param):

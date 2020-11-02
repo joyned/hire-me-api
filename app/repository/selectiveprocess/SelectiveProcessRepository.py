@@ -7,7 +7,7 @@ from app.model.selectiveprocess.SelectiveProcessStep import SelectiveProcessStep
 def create_selective_process(selective_process: SelectiveProcess, context: HireMeContext):
     sql = """
         INSERT INTO ProcessoSeletivo (Titulo, Id_Empresa, Id_Usuario)
-            VALUES(%s, %d, %d)
+            VALUES(?, ?, ?)
     """
 
     param = (selective_process.title, context.company_id, context.user_id)
@@ -18,7 +18,7 @@ def create_selective_process(selective_process: SelectiveProcess, context: HireM
 def create_selective_process_steps(step: SelectiveProcessStep):
     sql = """
     INSERT INTO EtapasProcessoSeletivo (Titulo_Etapa, Descricao_Etapa, Tipo_Etapa, Id_Questionario, Id_Processo_Seletivo)
-        VALUES(%s, %s, %s, %d, %d)
+        VALUES(?, ?, ?, ?, ?)
     """
 
     param = (step.step_title, step.step_description, step.step_type, step.questionnaire_id, step.selective_process_id)
@@ -28,7 +28,7 @@ def create_selective_process_steps(step: SelectiveProcessStep):
 
 def delete_seletive_process(selective_process_id):
     sql = """
-        DELETE FROM ProcessoSeletivo WHERE Id = %d
+        DELETE FROM ProcessoSeletivo WHERE Id = ?
     """
 
     param = (selective_process_id)
@@ -38,7 +38,7 @@ def delete_seletive_process(selective_process_id):
 
 def delete_selective_process_steps(selective_process_id):
     sql = """
-        DELETE FROM EtapasProcessoSeletivo WHERE Id_Processo_Seletivo = %d
+        DELETE FROM EtapasProcessoSeletivo WHERE Id_Processo_Seletivo = ?
     """
 
     param = (selective_process_id)
@@ -51,8 +51,8 @@ def list_selective_process_common_sql():
             SELECT  Id,
                     Titulo
             FROM ProcessoSeletivo
-            WHERE Id_Empresa = %d
-            AND Id_Usuario = %d
+            WHERE Id_Empresa = ?
+            AND Id_Usuario = ?
         """
 
 
@@ -67,7 +67,7 @@ def list_selective_process(context):
 def list_selective_process_by_id(context, selective_process_id):
     sql = list_selective_process_common_sql()
 
-    sql += " AND Id = %d"
+    sql += " AND Id = ?"
 
     param = (context.company_id, context.user_id, selective_process_id)
 
@@ -83,7 +83,7 @@ def list_selective_process_step(selective_process_id):
                 Id_Questionario,
                 Id_Processo_Seletivo
         FROM    EtapasProcessoSeletivo
-        WHERE   Id_Processo_Seletivo = %d
+        WHERE   Id_Processo_Seletivo = ?
     """
 
     param = (selective_process_id)
@@ -95,7 +95,7 @@ def selective_process_editable(selective_process_id):
     sql = """
         SELECT 1
         FROM Vaga 
-        WHERE Id_Processo_Seletivo = %d
+        WHERE Id_Processo_Seletivo = ?
     """
 
     param = (selective_process_id)
@@ -115,12 +115,12 @@ def get_selective_process_by_job_id(person_id, job_id):
         FROM    EtapasProcessoSeletivo
         LEFT JOIN ProcessoSeletivoAprovacao
         ON ProcessoSeletivoAprovacao.Id_Etapa = EtapasProcessoSeletivo.Id
-        AND ProcessoSeletivoAprovacao.Id_Vaga = %d
-        AND ProcessoSeletivoAprovacao.Id_Pessoa = %d
+        AND ProcessoSeletivoAprovacao.Id_Vaga = ?
+        AND ProcessoSeletivoAprovacao.Id_Pessoa = ?
         WHERE EtapasProcessoSeletivo.Id_Processo_Seletivo = (
             SELECT  Vaga.Id_Processo_Seletivo
             FROM    Vaga
-            WHERE   Vaga.Id = %d
+            WHERE   Vaga.Id = ?
         )
         ORDER BY EtapasProcessoSeletivo.Ordem
     """
@@ -141,9 +141,9 @@ def get_candidates(job_id):
         INNER JOIN Pessoa
         ON Pessoa.Id = VagasAplicadas.Id_Pessoa
         INNER JOIN ProcessoSeletivoAprovacao
-        ON ProcessoSeletivoAprovacao.Id_Vaga = %d
+        ON ProcessoSeletivoAprovacao.Id_Vaga = ?
         AND ProcessoSeletivoAprovacao.Id_Pessoa = Pessoa.Id
-        WHERE VagasAplicadas.Id_Vaga = %d
+        WHERE VagasAplicadas.Id_Vaga = ?
         AND ProcessoSeletivoAprovacao.Id IN (
             SELECT MAX(id) 
             FROM   ProcessoSeletivoAprovacao

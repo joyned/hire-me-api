@@ -1,5 +1,6 @@
 user:
-    username: admin
-    password: $B4tr0x2568251$
-    db: HireMeRemodel
-    host: hire-me.ceqbjxyoaid9.us-east-1.rds.amazonaws.com
+    username: joyned
+    password: $b4tr0x2568251$
+    db: HireMe
+    host: hireme-database.database.windows.net
+    driver: '{ODBC Driver 17 for SQL Server}'

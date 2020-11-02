@@ -13,7 +13,9 @@ def get_user_by_email(email):
         FROM    Usuario
             JOIN Pessoa 
                 ON Pessoa.Id_Usuario = Usuario.Id
-        WHERE Usuario.Email = %s
+        WHERE Usuario.Email = ?
     """
 
-    return db.execute_query_fetchone(sql, email)
+    param = (email)
+
+    return db.execute_query_fetchone(sql, param)

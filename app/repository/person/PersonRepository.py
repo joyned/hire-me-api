@@ -24,7 +24,7 @@ def get_candidate_details(person_id):
          ON PessoaEndereco.Id_Pessoa = Pessoa.Id
       JOIN  Usuario
          ON Usuario.Id = Pessoa.Id_Usuario
-    WHERE Pessoa.Id = %d
+    WHERE Pessoa.Id = ?
     """
     return db.execute_query_fetchone(sql, person_id)
 
@@ -32,11 +32,11 @@ def get_candidate_details(person_id):
 def update_person(person):
     sql = """
     UPDATE  Pessoa 
-    SET     Cidade = %s,
-            Estado = %s,
-            Pais = %s,
-            Foto = %s
-    WHERE   Id = %d
+    SET     Cidade = ?,
+            Estado = ?,
+            Pais = ?,
+            Foto = ?
+    WHERE   Id = ?
     """
     param = (person.city, person.state, person.country, person.photo, person.id)
 

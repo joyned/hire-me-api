@@ -4,7 +4,7 @@ from app.database import Database as db
 def save_new_job(job):
     sql = """
         INSERT INTO Vaga (Nome, Cidade, Estado, Salario, Descricao, Id_Empresa, Id_Usuario, Status, Id_Processo_Seletivo)
-            VALUES (%s, %s, %s, %d, %s, %d, %d, %s, %d)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
     param = (job.title, job.city, job.state, job.salary, job.description, job.company, job.user_id, 'T',
@@ -17,7 +17,7 @@ def save_job_benefits(job):
     for benefit in job.job_benefits:
         sql = """
             INSERT INTO VagaBeneficios (Id_Vaga, Beneficio)
-                VALUES (%d, %s)
+                VALUES (?, ?)
         """
 
         param = (job.id, benefit.benefit)
@@ -28,13 +28,13 @@ def save_job_benefits(job):
 def update_job(job):
     sql = """
      UPDATE Vaga SET
-        Nome = %s,
-        Cidade = %s,
-        Estado = %s,
-        Salario = %d,
-        Descricao = %s,
-        Id_Processo_Seletivo = %d
-    WHERE Id = %d
+        Nome = ?,
+        Cidade = ?,
+        Estado = ?,
+        Salario = ?,
+        Descricao = ?,
+        Id_Processo_Seletivo = ?
+    WHERE Id = ?
     """
 
     param = (job.title, job.city, job.state, job.salary, job.description, job.selective_process_id, job.id)
@@ -43,7 +43,7 @@ def update_job(job):
 
 def delete_job_benefits(job_id):
     sql = """
-        DELETE FROM VagaBeneficios WHERE Id_Vaga = %d
+        DELETE FROM VagaBeneficios WHERE Id_Vaga = ?
     """
 
     param = (job_id)
@@ -82,15 +82,15 @@ def filter_jobs(job_filter):
         """
 
     if job_filter.job is not None:
-        sql += " AND Nome LIKE %s"
+        sql += " AND Nome LIKE ?"
         params.append(job_filter.job + "%")
 
     if job_filter.localization is not None:
         sql += """
             AND (
-                Cidade LIKE %s
-                OR Estado LIKE %s
-                OR Pais LIKE %s
+                Cidade LIKE ?
+                OR Estado LIKE ?
+                OR Pais LIKE ?
             )
         """
         params.append(job_filter.localization + "%")
@@ -114,7 +114,7 @@ def get_job_by_id(id):
         FROM    Vaga
         JOIN Empresa
         ON Empresa.Id = Vaga.Id_Empresa
-        WHERE Vaga.Id = %d
+        WHERE Vaga.Id = ?
         AND Vaga.Status = 'T'
     """
     param = (id)
@@ -126,7 +126,7 @@ def get_job_benefits(job_id):
         SELECT Id_Vaga,
                Beneficio
         FROM VagaBeneficios
-        WHERE Id_Vaga = %d
+        WHERE Id_Vaga = ?
     """
 
     return db.execute_query_fetchall(sql, (job_id))
@@ -134,7 +134,7 @@ def get_job_benefits(job_id):
 
 def apply_to_job(person_id, job_id):
     sql = """
-        insert into VagasAplicadas (Id_Vaga, Id_Pessoa, Data_Aplicacao) values (%d, %d, GETDATE())
+        insert into VagasAplicadas (Id_Vaga, Id_Pessoa, Data_Aplicacao) values (?, ?, GETDATE())
     """
     param = (job_id, person_id)
     db.execute_insert(sql, param)
@@ -145,7 +145,7 @@ def check_first_seletive_process_step_by_job_id(job_id):
         SELECT  Id 
         FROM    EtapasProcessoSeletivo 
         WHERE Ordem = 1 
-        AND Id_Processo_Seletivo = (SELECT Id_Processo_Seletivo FROM Vaga WHERE Id = %d)
+        AND Id_Processo_Seletivo = (SELECT Id_Processo_Seletivo FROM Vaga WHERE Id = ?)
     """
 
     param = (job_id)
@@ -156,7 +156,7 @@ def check_first_seletive_process_step_by_job_id(job_id):
 def insert_first_step(context, job_id, step_id):
     sql = """
         INSERT INTO ProcessoSeletivoAprovacao(Id_Vaga, Id_Pessoa, Id_Processo_Seletivo, Id_Etapa, [Status])
-        SELECT %d, %d, Id_Processo_Seletivo, %d, %s FROM Vaga WHERE Id = %d
+        SELECT ?, ?, Id_Processo_Seletivo, ?, ? FROM Vaga WHERE Id = ?
     """
 
     param = (job_id, context.person_id, step_id[0], 'P', job_id)
@@ -166,7 +166,7 @@ def insert_first_step(context, job_id, step_id):
 
 def check_if_person_are_applied_to_job(person_id, job_id):
     sql = """
-        SELECT 1 FROM VagasAplicadas WHERE Id_Vaga = %d AND Id_Pessoa = %d
+        SELECT 1 FROM VagasAplicadas WHERE Id_Vaga = ? AND Id_Pessoa = ?
     """
 
     param = (job_id, person_id)
@@ -184,7 +184,7 @@ def get_applied_jobs(person_id):
     FROM    Vaga
     JOIN VagasAplicadas
     ON VagasAplicadas.Id_Vaga = Vaga.Id
-    AND VagasAplicadas.Id_Pessoa = %d
+    AND VagasAplicadas.Id_Pessoa = ?
     WHERE Vaga.Status = 'T'
     """
     param = (person_id)
@@ -195,7 +195,7 @@ def get_applied_jobs(person_id):
 #  TO SET INACTIVE
 def delete_apply_to_job(person_id, job_id):
     sql = """
-            delete from VagasAplicadas where Id_Vaga = %d and Id_Pessoa = %d
+            delete from VagasAplicadas where Id_Vaga = ? and Id_Pessoa = ?
         """
     param = (job_id, person_id)
     db.execute_delete(sql, param)
@@ -207,7 +207,7 @@ def get_jobs_by_user_id(user_id):
                 Nome,
                 Status
         FROM Vaga 
-        WHERE Id_Usuario = %d
+        WHERE Id_Usuario = ?
     """
 
     param = (user_id)
@@ -222,8 +222,8 @@ def get_data_to_chart_from_x_days(days, company_id):
     FROM VagasAplicadas
     JOIN Vaga
     ON Vaga.Id = VagasAplicadas.Id_Vaga
-    WHERE Data_Aplicacao BETWEEN (GETDATE() - %d) AND (GETDATE())
-    AND Vaga.Id_Empresa = %d
+    WHERE Data_Aplicacao BETWEEN (GETDATE() - ?) AND (GETDATE())
+    AND Vaga.Id_Empresa = ?
     GROUP BY VagasAplicadas.Data_Aplicacao,
              Vaga.Id_Empresa
     """
@@ -240,7 +240,7 @@ def get_candidates_by_job_id(job_id):
         FROM    VagasAplicadas
         JOIN Pessoa
         ON Pessoa.Id = VagasAplicadas.Id_Pessoa
-        WHERE VagasAplicadas.Id_Vaga = %d
+        WHERE VagasAplicadas.Id_Vaga = ?
     """
 
     param = (job_id)
@@ -251,8 +251,8 @@ def get_candidates_by_job_id(job_id):
 def change_job_status(status, job_id):
     sql = """
         UPDATE Vaga
-            SET Status = %s
-        WHERE Id = %d
+            SET Status = ?
+        WHERE Id = ?
     """
 
     param = (status, job_id)
@@ -263,7 +263,7 @@ def get_job_title_by_id(job_id):
     sql = """
         SELECT Nome
         FROM Vaga
-        WHERE Id = %d
+        WHERE Id = ?
         AND Status = 'T'
     """
 
