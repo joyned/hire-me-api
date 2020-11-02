@@ -1,6 +1,5 @@
 import os
 
-import yaml
 from flask import Flask
 from flask_cors import CORS
 
@@ -8,15 +7,16 @@ from app.rest.job.JobRest import job_rest
 from app.rest.login.LoginRest import login_rest
 from app.rest.page.PageRest import page_rest
 from app.rest.person.PersonRest import person_rest
+from app.rest.questionnaire.QuestionnaireRest import questionnaire_rest
 from app.rest.register.RegisterRest import register_rest
 from app.rest.selectiveprocess.SelectiveProcessRest import selective_process_rest
 from app.rest.selectiveprocessapproval.ApprovalSelectiveProcessRest import approval_selective_process_rest
 from app.rest.user.UserRest import user_rest
-from app.rest.questionnaire.QuestionnaireRest import questionnaire_rest
+from app.utils.resource import ResourceUtil
 
 app = Flask(__name__, template_folder="html")
 
-environment = yaml.load(open('resource/environment.yml'))
+environment = ResourceUtil.get_resource_file('environment.yml')
 
 production = environment['environment']['production']
 

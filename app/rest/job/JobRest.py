@@ -1,5 +1,4 @@
 from flask import Blueprint, request
-from flask_cors import cross_origin
 
 from app.security.TokenValidator import token_validator
 from app.service.job import JobService
@@ -44,7 +43,6 @@ def check_if_person_can_apply(job_id):
 
 @job_rest.route('/api/job/applied-jobs', methods=['GET'])
 @token_validator(request)
-@cross_origin()
 def get_applied_jobs():
     return Response.execute(JobService.get_applied_jobs, request, error_status_code=400)
 

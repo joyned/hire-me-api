@@ -4,7 +4,9 @@ import jwt
 import yaml
 from flask import jsonify
 
-app_config = yaml.load(open('resource/app_config.yml'))
+from app.utils.resource import ResourceUtil
+
+app_config = ResourceUtil.get_resource_file('app_config.yml')
 
 
 def token_validator(request):

@@ -1,8 +1,9 @@
 import pymssql
-import yaml
 
-db_properties = yaml.load(open('resource/db_properties.yml'))
-environment = yaml.load(open('resource/environment.yml'))
+from app.utils.resource import ResourceUtil
+
+db_properties = ResourceUtil.get_resource_file('db_properties.yml')
+environment = ResourceUtil.get_resource_file('environment.yml')
 
 connection = {
     'host': db_properties['user']['host'],

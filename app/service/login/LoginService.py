@@ -1,14 +1,14 @@
 import datetime
 
 import jwt
-import yaml
 from werkzeug.security import check_password_hash
 
 import app.service.page.PageService as PageService
 from app.model.person.Person import Person
 from app.repository.login import LoginRepository
+from app.utils.resource import ResourceUtil
 
-app_config = yaml.load(open('resource/app_config.yml'))
+app_config = ResourceUtil.get_resource_file('app_config.yml')
 
 
 def login(request):
