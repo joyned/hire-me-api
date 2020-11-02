@@ -37,7 +37,6 @@ def db_connection():
 
 
 def create_connection():
-    # return pymssql.connect(connection['host'], 1433, connection['username'], connection['password'], connection['db'])
     return pyodbc.connect('DRIVER=' + connection['driver'] + ';SERVER=' + connection['host'] + ';PORT=1433;DATABASE=' + connection['db'] + ';UID=' + connection['username'] + ';PWD=' + connection['password'])
 
 
@@ -77,8 +76,8 @@ def execute_insert(sql, param):
         conn = create_local_connection()
     cursor = conn.cursor()
     cursor.execute(sql, param)
+    last_row_id = cursor.fetchone()[0]
     conn.commit()
-    last_row_id = cursor.lastrowid
     conn.rollback()
     conn.close()
     return last_row_id
