@@ -17,7 +17,8 @@ connection_local = {
     'host': 'localhost',
     'username': 'SA',
     'password': '$b4tr0x2568251$',
-    'db': 'HireMeRemodel'
+    'db': 'HireMeRemodel',
+    'driver': db_properties['user']['driver']
 }
 
 prod = bool(environment['environment']['production'])
@@ -37,12 +38,15 @@ def db_connection():
 
 
 def create_connection():
-    return pyodbc.connect('DRIVER=' + connection['driver'] + ';SERVER=' + connection['host'] + ';PORT=1433;DATABASE=' + connection['db'] + ';UID=' + connection['username'] + ';PWD=' + connection['password'])
+    return pyodbc.connect(
+        'DRIVER=' + connection['driver'] + ';SERVER=' + connection['host'] + ';PORT=1433;DATABASE=' + connection[
+            'db'] + ';UID=' + connection['username'] + ';PWD=' + connection['password'])
 
 
 def create_local_connection():
-    # return pymssql.connect(connection_local['host'], connection_local['username'], connection_local['password'], connection_local['db'])
-    return 0
+    return pyodbc.connect(
+        'DRIVER=' + connection_local['driver'] + ';SERVER=' + connection_local['host'] + ';PORT=1433;DATABASE=' +
+        connection_local['db'] + ';UID=' + connection_local['username'] + ';PWD=' + connection_local['password'])
 
 
 def execute_query_fetchall(sql, param):
@@ -76,11 +80,17 @@ def execute_insert(sql, param):
         conn = create_local_connection()
     cursor = conn.cursor()
     cursor.execute(sql, param)
-    last_row_id = cursor.fetchone()[0]
+    last_row_id = get_last_inserted_row_id(cursor)
     conn.commit()
     conn.rollback()
     conn.close()
     return last_row_id
+
+
+def get_last_inserted_row_id(cursor):
+    cursor.execute("SELECT @@IDENTITY")
+    row = cursor.fetchone()
+    return row[0]
 
 
 def execute_update(sql, param):
