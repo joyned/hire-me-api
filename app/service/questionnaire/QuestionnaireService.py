@@ -97,7 +97,8 @@ def get_questionnaire(request, questionnaire_id, approval_id, for_view):
         question.question_title = row_question[1]
         question.question_help = row_question[2]
         question.answer_type = row_question[3]
-        question.questionnaire_answer = row_question[4]
+        if approval_id is not None:
+            question.questionnaire_answer = row_question[4]
         question.questionnaire_id = questionnaire_id
 
         questionnaire.questionnaire_questions.append(question.serialize())
@@ -162,7 +163,7 @@ def get_questionnaire_by_job_id_and_person_id(request):
 
 def questionnaire_editable(questionnaire_id):
     result = QuestionnaireRepository.questionnaire_editable(questionnaire_id)
-    if result == 1:
+    if not len(result) == 0:
         return False
     else:
         return True

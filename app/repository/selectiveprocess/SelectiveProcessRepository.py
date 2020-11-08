@@ -17,11 +17,11 @@ def create_selective_process(selective_process: SelectiveProcess, context: HireM
 
 def create_selective_process_steps(step: SelectiveProcessStep):
     sql = """
-    INSERT INTO EtapasProcessoSeletivo (Titulo_Etapa, Descricao_Etapa, Tipo_Etapa, Id_Questionario, Id_Processo_Seletivo)
-        VALUES(?, ?, ?, ?, ?)
+    INSERT INTO EtapasProcessoSeletivo (Titulo_Etapa, Descricao_Etapa, Tipo_Etapa, Id_Questionario, Id_Processo_Seletivo, Ordem)
+        VALUES(?, ?, ?, ?, ?, ?)
     """
 
-    param = (step.step_title, step.step_description, step.step_type, step.questionnaire_id, step.selective_process_id)
+    param = (step.step_title, step.step_description, step.step_type, step.questionnaire_id, step.selective_process_id, step.order)
 
     return db.execute_insert(sql, param)
 
@@ -81,9 +81,11 @@ def list_selective_process_step(selective_process_id):
                 Descricao_Etapa,
                 Tipo_Etapa,
                 Id_Questionario,
-                Id_Processo_Seletivo
+                Id_Processo_Seletivo,
+                Ordem
         FROM    EtapasProcessoSeletivo
         WHERE   Id_Processo_Seletivo = ?
+        ORDER BY Ordem
     """
 
     param = (selective_process_id)
@@ -98,9 +100,9 @@ def selective_process_editable(selective_process_id):
         WHERE Id_Processo_Seletivo = ?
     """
 
-    param = (selective_process_id)
+    param = (selective_process_id,)
 
-    return db.execute_count_lines(sql, param)
+    return db.execute_query_fetchall(sql, param)
 
 
 def get_selective_process_by_job_id(person_id, job_id):
@@ -140,15 +142,15 @@ def get_candidates(job_id):
         FROM    VagasAplicadas
         INNER JOIN Pessoa
         ON Pessoa.Id = VagasAplicadas.Id_Pessoa
-        INNER JOIN ProcessoSeletivoAprovacao
+        LEFT JOIN ProcessoSeletivoAprovacao
         ON ProcessoSeletivoAprovacao.Id_Vaga = ?
         AND ProcessoSeletivoAprovacao.Id_Pessoa = Pessoa.Id
-        WHERE VagasAplicadas.Id_Vaga = ?
         AND ProcessoSeletivoAprovacao.Id IN (
             SELECT MAX(id) 
             FROM   ProcessoSeletivoAprovacao
             GROUP BY Id_Vaga, Id_Pessoa, Id_Processo_Seletivo
         )
+        WHERE VagasAplicadas.Id_Vaga = ?
         GROUP BY Pessoa.Id, Pessoa.Nome, VagasAplicadas.Data_Aplicacao, ProcessoSeletivoAprovacao.[Status]
         ORDER BY Nome
     """

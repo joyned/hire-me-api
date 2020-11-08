@@ -38,6 +38,7 @@ def create_selective_process(request):
         if not row_step.get('questionnaireId') == 0:
             step.questionnaire_id = row_step.get('questionnaireId')
         step.selective_process_id = selective_process.id
+        step.order = row_step.get('order')
 
         SelectiveProcessRepository.create_selective_process_steps(step)
 
@@ -87,6 +88,7 @@ def list_selective_process(request, selective_process_id):
         step.step_type = row_step[3]
         step.questionnaire_id = row_step[4]
         step.selective_process_id = row_step[5]
+        step.order = row_step[6]
 
         steps.append(step.serialize())
 
@@ -97,7 +99,10 @@ def list_selective_process(request, selective_process_id):
 
 def selective_process_editable(selective_process_id):
     result = SelectiveProcessRepository.selective_process_editable(selective_process_id)
-    return result == 0
+    if not len(result) == 0:
+        return False
+    else:
+        return True
 
 
 def get_selective_process_by_job_id(request, job_id):

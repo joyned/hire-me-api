@@ -116,7 +116,7 @@ def execute_count_lines(sql, param):
     cursor = conn.cursor()
     cursor.execute(sql, param)
     cursor.fetchall()
-    res = int(cursor.rowcount)
+    res = int(len(cursor.fetchall()))
     conn.close()
     return res
 

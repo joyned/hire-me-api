@@ -120,20 +120,25 @@ def get_questionnaire_question_by_id(questionnaire_id, approval_id):
         SELECT  QuestionarioQuestao.Id,
                 QuestionarioQuestao.Titulo_Questao,
                 QuestionarioQuestao.Titulo_Ajuda,
-                QuestionarioQuestao.Tipo_Resposta,
-                QuestionarioQuestaoResposta.Resposta
-        FROM QuestionarioQuestao
-        LEFT JOIN QuestionarioQuestaoResposta
-        ON QuestionarioQuestaoResposta.Id_Questao = QuestionarioQuestao.Id
+                QuestionarioQuestao.Tipo_Resposta
     """
 
     if approval_id is not None:
-        sql += " AND QuestionarioQuestaoResposta.Id_Processo_Aprovacao = ? "
-        sql += "        WHERE QuestionarioQuestao.Id_Questionario = ?"
+        sql += """
+                ,QuestionarioQuestaoResposta.Resposta
+            FROM QuestionarioQuestao
+            LEFT JOIN QuestionarioQuestaoResposta 
+            ON QuestionarioQuestaoResposta.Id_Questao = QuestionarioQuestao.Id
+            AND QuestionarioQuestaoResposta.Id_Processo_Aprovacao = ?
+             WHERE QuestionarioQuestao.Id_Questionario = ?
+        """
         param = (approval_id, questionnaire_id)
         return db.execute_query_fetchall(sql, param)
     else:
-        sql += "        WHERE QuestionarioQuestao.Id_Questionario = ?"
+        sql += """
+              FROM QuestionarioQuestao
+              WHERE QuestionarioQuestao.Id_Questionario = ?  
+        """
         param = (questionnaire_id)
         return db.execute_query_fetchall(sql, param)
 
@@ -188,9 +193,9 @@ def questionnaire_editable(questionnaire_id):
         SELECT 1 FROM EtapasProcessoSeletivo WHERE Id_Questionario = ?
     """
 
-    param = (questionnaire_id)
+    param = (questionnaire_id,)
 
-    return db.execute_count_lines(sql, param)
+    return db.execute_query_fetchall(sql, param)
 
 
 def answer_questionnaire(questionnaire_answer):

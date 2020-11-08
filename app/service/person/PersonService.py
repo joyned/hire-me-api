@@ -1,5 +1,6 @@
 from app.model.context.HireMeContext import HireMeContext
 from app.model.person.Person import Person
+from app.model.person.ProfessionalHistory import ProfessionalHistory
 from app.repository.person import PersonRepository
 
 
@@ -42,3 +43,42 @@ def update_candidate_details(request):
     person.country = data['country']
     person.photo = data['photo']
     return PersonRepository.update_person(person)
+
+
+def get_professional_histories(request):
+    context = HireMeContext()
+    context.build(request)
+
+    professional_histories = []
+
+    for row in PersonRepository.get_professional_histories(context):
+        professional_history = ProfessionalHistory()
+        professional_history.id = row[0]
+        professional_history.id_person = row[1]
+        professional_history.company = row[2]
+        professional_history.job = row[3]
+        professional_history.description = row[4]
+        professional_history.initialDate = row[5]
+        professional_history.finalDate = row[6]
+        professional_history.currentJob = row[7] == 'T'
+
+        professional_histories.append(professional_history.serialize())
+
+    return professional_histories
+
+
+def update_professional_history(request):
+    data = request.get_json()
+
+    professional_history = ProfessionalHistory()
+
+    professional_history.id = data.get('id')
+    professional_history.id_person = data.get('personId')
+    professional_history.company = data.get('company')
+    professional_history.job = data.get('job')
+    professional_history.description = data.get('description')
+    professional_history.initialDate = data.get('initialDate')
+    professional_history.finalDate = data.get('finalDate')
+    professional_history.currentJob = data.get('currentJob')
+
+    PersonRepository.update_professional_history(professional_history)
