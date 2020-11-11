@@ -29,3 +29,15 @@ def get_professional_histories():
 @token_validator(request)
 def update_professional_history():
     return Response.execute(PersonService.update_professional_history, request, error_status_code=400)
+
+
+@person_rest.route('/api/person/abilities/get', methods=['GET'])
+@token_validator(request)
+def get_abilities():
+    return Response.execute(PersonService.get_abilities, request, error_status_code=400)
+
+
+@person_rest.route('/api/person/abilities', methods=['POST'])
+@token_validator(request)
+def insert_abilities():
+    return Response.execute(PersonService.insert_ability, request, error_status_code=400)

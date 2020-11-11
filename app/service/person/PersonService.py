@@ -1,5 +1,6 @@
 from app.model.context.HireMeContext import HireMeContext
 from app.model.person.Person import Person
+from app.model.person.PersonHability import PersonAbility
 from app.model.person.ProfessionalHistory import ProfessionalHistory
 from app.repository.person import PersonRepository
 
@@ -12,24 +13,25 @@ def get_person_details(request):
 
     result = PersonRepository.get_candidate_details(context.person_id)
 
-    person.id = result[0]
-    person.user.id = result[1]
-    person.name = result[2]
-    person.fullname = result[3]
-    person.cpf = result[4]
-    person.rg = result[5]
-    person.city = result[6]
-    person.state = result[7]
-    person.country = result[8]
-    person.photo = result[9]
-    person.birthdate = result[10]
-    person.person_addres.address = result[11]
-    person.person_addres.number = int(result[12])
-    person.person_addres.complement = result[13]
-    person.person_addres.cep = int(result[14])
-    person.user.email = result[15]
-    return person.serialize()
-
+    if result is not None:
+        person.id = result[0]
+        person.user.id = result[1]
+        person.name = result[2]
+        person.fullname = result[3]
+        person.cpf = result[4]
+        person.rg = result[5]
+        person.city = result[6]
+        person.state = result[7]
+        person.country = result[8]
+        person.photo = result[9]
+        person.birthdate = result[10]
+        person.person_addres.address = result[11]
+        person.person_addres.number = int(result[12])
+        person.person_addres.complement = result[13]
+        person.person_addres.cep = int(result[14])
+        person.user.email = result[15]
+        return person.serialize()
+    return {}
 
 def update_candidate_details(request):
     context = HireMeContext()
@@ -82,3 +84,31 @@ def update_professional_history(request):
     professional_history.currentJob = data.get('currentJob')
 
     PersonRepository.update_professional_history(professional_history)
+
+
+def get_abilities(request):
+    context = HireMeContext()
+    context.build(request)
+
+    abilities = []
+
+    for row in PersonRepository.get_abilities(context):
+        abilities.append(row[0])
+
+    return abilities
+
+
+def insert_ability(request):
+    context = HireMeContext()
+    context.build(request)
+
+    data = request.get_json()
+
+    delete_abilities(context)
+
+    for row_ability in data:
+        PersonRepository.insert_abilities(context, row_ability)
+
+
+def delete_abilities(context: HireMeContext):
+    PersonRepository.delete_abilities(context)

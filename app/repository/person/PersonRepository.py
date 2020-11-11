@@ -87,3 +87,36 @@ def update_professional_history(professional_history: ProfessionalHistory):
              professional_history.id)
 
     return db.execute_update(sql, param)
+
+
+def get_abilities(context: HireMeContext):
+    sql = """
+        SELECT  Habilidade
+        FROM PessoaHabilidades
+        WHERE Id_Pessoa = ?
+    """
+
+    param = (context.person_id,)
+
+    return db.execute_query_fetchall(sql, param)
+
+
+def insert_abilities(context: HireMeContext, ability: str):
+    sql = """
+        INSERT INTO PessoaHabilidades (Id_Pessoa, Habilidade)
+            VALUES (?, ?)
+    """
+
+    param = (context.person_id, ability)
+
+    db.execute_insert(sql, param)
+
+
+def delete_abilities(context: HireMeContext):
+    sql = """
+        DELETE FROM PessoaHabilidades WHERE Id_Pessoa = ?
+    """
+
+    param = (context.person_id,)
+
+    db.execute_delete(sql, param)
