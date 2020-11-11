@@ -1,6 +1,7 @@
 from app.database import Database as db
 from app.model.context.HireMeContext import HireMeContext
 from app.model.person.ProfessionalHistory import ProfessionalHistory
+from app.utils.logger import Logger
 
 
 def get_candidate_details(person_id):
@@ -28,6 +29,9 @@ def get_candidate_details(person_id):
          ON Usuario.Id = Pessoa.Id_Usuario
     WHERE Pessoa.Id = ?
     """
+
+    Logger.debug(sql.replace("?", str(person_id)))
+
     return db.execute_query_fetchone(sql, person_id)
 
 
