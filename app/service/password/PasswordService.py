@@ -13,29 +13,26 @@ def reset_password(request):
     data = request.get_json()
     email = data.get('email')
 
-    try:
-        if PasswordRepository.check_if_email_exists(email) is not None:
-            email_message = EmailMessage()
-            new_password = generate_random_password()
+    if PasswordRepository.check_if_email_exists(email) is not None:
+        email_message = EmailMessage()
+        new_password = generate_random_password()
 
-            email_message.body = """
-                    <h1>Senha</h1>
-                    <p>Sua nova senha é: <b>{0}</b></p>
-                """.format(new_password)
+        email_message.body = """
+                <h1>Senha</h1>
+                <p>Sua nova senha é: <b>{0}</b></p>
+            """.format(new_password)
 
-            email_message.from_email = 'noreply@hireme.com'
-            email_message.to = email
-            email_message.subject = 'Hire Me - Nova senha'
+        email_message.from_email = 'noreply@hireme.com'
+        email_message.to = email
+        email_message.subject = 'Hire Me - Nova senha'
 
-            hash_password = generate_password_hash(new_password, method='sha256')
+        hash_password = generate_password_hash(new_password, method='sha256')
 
-            PasswordRepository.update_password_by_email(email, hash_password)
+        PasswordRepository.update_password_by_email(email, hash_password)
 
-            return EmailService.send_email(email_message)
-        else:
-            raise KeyError('email.not.found')
-    except Exception as e:
-        raise Exception(e)
+        return EmailService.send_email(email_message)
+    else:
+        return 'email.not.found'
 
 
 def generate_random_password():

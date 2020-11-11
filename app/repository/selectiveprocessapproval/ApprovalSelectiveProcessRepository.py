@@ -71,3 +71,25 @@ def can_approve(approved_step_id):
         return db.execute_query_fetchone(sql, param)
     else:
         return False
+
+
+def get_info_to_email(approved_step_id):
+    sql = """
+        SELECT  EtapasProcessoSeletivo.Titulo_Etapa,
+                Vaga.Nome,
+                Usuario.Email
+        FROM    ProcessoSeletivoAprovacao
+        JOIN EtapasProcessoSeletivo
+        ON ProcessoSeletivoAprovacao.Id_Etapa = EtapasProcessoSeletivo.Id
+        JOIN Vaga
+        ON ProcessoSeletivoAprovacao.Id_Vaga = Vaga.Id
+        JOIN Pessoa
+        ON Pessoa.Id = ProcessoSeletivoAprovacao.Id_Pessoa
+        JOIN Usuario
+        ON Usuario.Id = Pessoa.Id_Usuario
+        WHERE ProcessoSeletivoAprovacao.Id = ?
+    """
+
+    param = (approved_step_id,)
+
+    return db.execute_query_fetchone(sql, param)

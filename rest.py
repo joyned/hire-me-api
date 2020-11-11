@@ -4,6 +4,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from app.rest.company.CompanyRest import company_rest
+from app.rest.contact.ContactRest import contact_rest
 from app.rest.job.JobRest import job_rest
 from app.rest.login.LoginRest import login_rest
 from app.rest.page.PageRest import page_rest
@@ -36,6 +37,7 @@ app.register_blueprint(selective_process_rest)
 app.register_blueprint(approval_selective_process_rest)
 app.register_blueprint(password_rest)
 app.register_blueprint(company_rest)
+app.register_blueprint(contact_rest)
 
 if __name__ == '__main__':
     if production:
