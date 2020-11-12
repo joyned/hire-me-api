@@ -1,3 +1,6 @@
 mail:
-  host: 'localhost'
-  port: 1025
+  host: 'smtp.gmail.com'
+  port: 587
+  user: 'hiremecop@gmail.com'
+  pwd: 'hireme123hireme'
+

@@ -22,7 +22,7 @@ def reset_password(request):
                 <p>Sua nova senha é: <b>{0}</b></p>
             """.format(new_password)
 
-        email_message.from_email = 'noreply@hireme.com'
+        email_message.from_email = 'hiremecop@gmail.com'
         email_message.to = email
         email_message.subject = 'Hire Me - Nova senha'
 

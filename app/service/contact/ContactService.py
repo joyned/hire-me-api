@@ -20,7 +20,7 @@ def send_contact_email(request):
         <p>{3}</p>
     """.format(name, position, email, message)
 
-    email_message.to = 'brunodsbg@gmail.com';
+    email_message.to = 'brunodsbg@gmail.com;lorenzo.ceunsp@gmail.com';
     email_message.body = email_body
     email_message.subject = 'Contato'
     email_message.from_email = 'panico400@gmail.com'
