@@ -49,7 +49,7 @@ def update_person(person):
     db.execute_insert(sql, param)
 
 
-def get_professional_histories(context: HireMeContext):
+def get_professional_histories(person_id: int):
     sql = """
         SELECT  Id,
                 Id_Pessoa,
@@ -64,9 +64,27 @@ def get_professional_histories(context: HireMeContext):
         ORDER BY Data_Entrada DESC
     """
 
-    param = (context.person_id,)
+    param = (person_id,)
 
     return db.execute_query_fetchall(sql, param)
+
+
+def insert_professional_history(professional_history: ProfessionalHistory, context: HireMeContext):
+    sql = """
+        INSERT INTO PessoaHistoricoProfissional (Id_Pessoa, Empresa, Cargo, Descricao, Data_Entrada, Data_Saida, Trabalha_Atualmente)
+            VALUES (?,?,?,?,?,?,?)
+    """
+
+    if professional_history.current_job:
+        current_job = 'T'
+    else:
+        current_job = 'F'
+
+    param = (
+        context.person_id, professional_history.company, professional_history.job, professional_history.description,
+        professional_history.initial_date, professional_history.final_date, current_job)
+
+    db.execute_insert(sql, param)
 
 
 def update_professional_history(professional_history: ProfessionalHistory):
@@ -81,26 +99,36 @@ def update_professional_history(professional_history: ProfessionalHistory):
         WHERE Id = ?
     """
 
-    if professional_history.currentJob:
+    if professional_history.current_job:
         current_job = 'T'
     else:
         current_job = 'F'
 
     param = (professional_history.company, professional_history.job, professional_history.description,
-             professional_history.initialDate, professional_history.finalDate, current_job,
+             professional_history.initial_date, professional_history.final_date, current_job,
              professional_history.id)
 
     return db.execute_update(sql, param)
 
 
-def get_abilities(context: HireMeContext):
+def delete_professional_history(professional_history_id):
+    sql = """
+        DELETE FROM PessoaHistoricoProfissional WHERE Id = ?
+    """
+
+    param = (professional_history_id,)
+
+    db.execute_delete(sql, param)
+
+
+def get_abilities(person_id: int):
     sql = """
         SELECT  Habilidade
         FROM PessoaHabilidades
         WHERE Id_Pessoa = ?
     """
 
-    param = (context.person_id,)
+    param = (person_id,)
 
     return db.execute_query_fetchall(sql, param)
 
@@ -124,3 +152,20 @@ def delete_abilities(context: HireMeContext):
     param = (context.person_id,)
 
     db.execute_delete(sql, param)
+
+
+def get_person_profile(person_id):
+    sql = """
+        SELECT  Pessoa.Foto,
+                Pessoa.Nome,
+                Pessoa.Nome_Completo,
+                Pessoa.Cidade,
+                Pessoa.Estado,
+                Pessoa.Data_Nascimento
+        FROM    Pessoa
+        WHERE Pessoa.Id = ?
+    """
+
+    param = (person_id,)
+
+    return db.execute_query_fetchone(sql, param)

@@ -19,16 +19,22 @@ def update_person_details():
     return Response.execute(PersonService.update_candidate_details, request, error_status_code=400)
 
 
-@person_rest.route('/api/person/professional/history', methods=['GET'])
+@person_rest.route('/api/person/professional/history/get', methods=['GET'])
 @token_validator(request)
 def get_professional_histories():
     return Response.execute(PersonService.get_professional_histories, request, error_status_code=404)
 
 
-@person_rest.route('/api/person/professional/history/update', methods=['POST'])
+@person_rest.route('/api/person/professional/history', methods=['PUT'])
 @token_validator(request)
-def update_professional_history():
-    return Response.execute(PersonService.update_professional_history, request, error_status_code=400)
+def professional_history():
+    return Response.execute(PersonService.professional_history, request, error_status_code=400)
+
+
+@person_rest.route('/api/person/professional/history/delete/<professional_history_id>', methods=['DELETE'])
+@token_validator(request)
+def delete_professional_history(professional_history_id):
+    return Response.execute(PersonService.delete_professional_history, professional_history_id, error_status_code=400)
 
 
 @person_rest.route('/api/person/abilities/get', methods=['GET'])
@@ -41,3 +47,9 @@ def get_abilities():
 @token_validator(request)
 def insert_abilities():
     return Response.execute(PersonService.insert_ability, request, error_status_code=400)
+
+
+@person_rest.route('/api/person/profile/<person_id>', methods=['GET'])
+@token_validator(request)
+def get_person_profile(person_id):
+    return Response.execute(PersonService.get_person_profile, person_id, error_status_code=403)

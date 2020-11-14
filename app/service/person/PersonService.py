@@ -33,6 +33,7 @@ def get_person_details(request):
         return person.serialize()
     return {}
 
+
 def update_candidate_details(request):
     context = HireMeContext()
     context.build(request)
@@ -53,23 +54,26 @@ def get_professional_histories(request):
 
     professional_histories = []
 
-    for row in PersonRepository.get_professional_histories(context):
+    for row in PersonRepository.get_professional_histories(context.person_id):
         professional_history = ProfessionalHistory()
         professional_history.id = row[0]
         professional_history.id_person = row[1]
         professional_history.company = row[2]
         professional_history.job = row[3]
         professional_history.description = row[4]
-        professional_history.initialDate = row[5]
-        professional_history.finalDate = row[6]
-        professional_history.currentJob = row[7] == 'T'
+        professional_history.initial_date = row[5]
+        professional_history.final_date = row[6]
+        professional_history.current_job = row[7] == 'T'
 
         professional_histories.append(professional_history.serialize())
 
     return professional_histories
 
 
-def update_professional_history(request):
+def professional_history(request):
+    context = HireMeContext()
+    context.build(request)
+
     data = request.get_json()
 
     professional_history = ProfessionalHistory()
@@ -79,11 +83,18 @@ def update_professional_history(request):
     professional_history.company = data.get('company')
     professional_history.job = data.get('job')
     professional_history.description = data.get('description')
-    professional_history.initialDate = data.get('initialDate')
-    professional_history.finalDate = data.get('finalDate')
-    professional_history.currentJob = data.get('currentJob')
+    professional_history.initial_date = data.get('initialDate')
+    professional_history.final_date = data.get('finalDate')
+    professional_history.current_job = data.get('currentJob')
 
-    PersonRepository.update_professional_history(professional_history)
+    if professional_history.id is not None and professional_history.id > 0:
+        PersonRepository.update_professional_history(professional_history)
+    else:
+        PersonRepository.insert_professional_history(professional_history, context)
+
+
+def delete_professional_history(professional_history_id):
+    PersonRepository.delete_professional_history(professional_history_id)
 
 
 def get_abilities(request):
@@ -92,7 +103,7 @@ def get_abilities(request):
 
     abilities = []
 
-    for row in PersonRepository.get_abilities(context):
+    for row in PersonRepository.get_abilities(context.person_id):
         abilities.append(row[0])
 
     return abilities
@@ -112,3 +123,51 @@ def insert_ability(request):
 
 def delete_abilities(context: HireMeContext):
     PersonRepository.delete_abilities(context)
+
+
+def get_person_profile(person_id):
+    person = Person()
+    person_professional_histories = []
+    person_abilities = []
+
+    person_data = PersonRepository.get_person_profile(person_id)
+    person_professional_history_data = PersonRepository.get_professional_histories(person_id)
+    person_abilities_data = PersonRepository.get_abilities(person_id)
+
+    if person_data is not None:
+        person.id = person_id
+        person.photo = person_data[0]
+        person.name = person_data[1]
+        person.fullname = person_data[2]
+        person.city = person_data[3]
+        person.state = person_data[4]
+        person.birthdate = person_data[5]
+
+    if person_professional_history_data is not None and len(person_professional_history_data) > 0:
+        for professional_history_row in person_professional_history_data:
+            professional_history = ProfessionalHistory()
+            professional_history.id = professional_history_row[0]
+            professional_history.id_person = professional_history_row[1]
+            professional_history.company = professional_history_row[2]
+            professional_history.job = professional_history_row[3]
+            professional_history.description = professional_history_row[4]
+            professional_history.initial_date = professional_history_row[5]
+            professional_history.final_date = professional_history_row[6]
+            if professional_history_row[0] == "T":
+                professional_history.current_job = "T"
+            else:
+                professional_history.current_job = "F"
+            person_professional_histories.append(professional_history.serialize())
+
+    if person_abilities_data is not None and len(person_abilities_data) > 0:
+        for person_abilities_row in person_abilities_data:
+            person_ability = PersonAbility()
+            person_ability.person_id = person_id
+            person_ability.ability = person_abilities_row[0]
+            person_abilities.append(person_ability.serialize())
+
+    return {
+        'person': person.serialize(),
+        'professionalHistories': person_professional_histories,
+        'abilities': person_abilities
+    }

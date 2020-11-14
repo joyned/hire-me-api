@@ -3,4 +3,7 @@ mail:
   port: 587
   user: 'hiremecop@gmail.com'
   pwd: 'hireme123hireme'
+localhost:
+  host: 'localhost'
+  port: 1025
 

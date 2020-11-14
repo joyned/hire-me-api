@@ -5,9 +5,9 @@ class ProfessionalHistory:
         self.company = None
         self.job = None
         self.description = None
-        self.initialDate = None
-        self.finalDate = None
-        self.currentJob = False
+        self.initial_date = None
+        self.final_date = None
+        self.current_job = False
 
     def serialize(self):
         return {
@@ -16,7 +16,7 @@ class ProfessionalHistory:
             'job': self.job,
             'company': self.company,
             'description': self.description,
-            'initialDate': self.initialDate,
-            'finalDate': self.finalDate,
-            'currentJob': self.currentJob
+            'initialDate': self.initial_date,
+            'finalDate': self.final_date,
+            'currentJob': self.current_job
         }
