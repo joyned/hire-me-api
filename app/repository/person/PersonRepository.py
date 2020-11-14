@@ -1,5 +1,6 @@
 from app.database import Database as db
 from app.model.context.HireMeContext import HireMeContext
+from app.model.person.PersonEducation import PersonEducation
 from app.model.person.ProfessionalHistory import ProfessionalHistory
 from app.utils.logger import Logger
 
@@ -169,3 +170,71 @@ def get_person_profile(person_id):
     param = (person_id,)
 
     return db.execute_query_fetchone(sql, param)
+
+
+def get_person_education(person_id):
+    sql = """
+        SELECT  Id,
+                Id_Pessoa,
+                Instituicao,
+                Curso,
+                Data_Inicio,
+                Data_Fim,
+                Cursando
+        FROM    PessoaEscolaridade
+        WHERE   PessoaEscolaridade.Id_Pessoa = ?
+    """
+
+    param = (person_id,)
+
+    return db.execute_query_fetchall(sql, param)
+
+def insert_person_education(person_education: PersonEducation):
+    sql = """
+        INSERT INTO PessoaEscolaridade (Id_Pessoa, Instituicao, Curso, Data_Inicio, Data_Fim, Cursando)
+            VALUES(?,?,?,?,?,?)
+    """
+
+    if person_education.current_study:
+        current_study = 'T'
+    else:
+        current_study = 'F'
+
+    param = (
+        person_education.person_id, person_education.institution, person_education.course,
+        person_education.initial_date,
+        person_education.final_date, current_study)
+
+    db.execute_insert(sql, param)
+
+
+def update_person_education(person_education: PersonEducation):
+    sql = """
+        UPDATE PessoaEscolaridade
+            SET Instituicao = ?,
+                Curso = ?,
+                Data_Inicio = ?,
+                Data_FIm = ?,
+                Cursando = ?
+            WHERE Id = ?
+    """
+
+    if person_education.current_study:
+        current_study = 'T'
+    else:
+        current_study = 'F'
+
+    param = (person_education.institution, person_education.course,
+             person_education.initial_date, person_education.final_date, current_study, person_education.id)
+
+    db.execute_update(sql, param)
+
+
+def delete_person_education(person_education_id):
+    sql = """
+        DELETE FROM PessoaEscolaridade WHERE Id = ?
+    """
+
+    param = (person_education_id,)
+
+    db.execute_delete(sql, param)

@@ -53,3 +53,21 @@ def insert_abilities():
 @token_validator(request)
 def get_person_profile(person_id):
     return Response.execute(PersonService.get_person_profile, person_id, error_status_code=403)
+
+
+@person_rest.route('/api/person/education/get', methods=['GET'])
+@token_validator(request)
+def get_person_education():
+    return Response.execute(PersonService.get_person_education, request, error_status_code=400)
+
+
+@person_rest.route('/api/person/education', methods=['PUT'])
+@token_validator(request)
+def person_education():
+    return Response.execute(PersonService.person_education, request, error_status_code=400)
+
+
+@person_rest.route('/api/person/education/delete/<person_education_id>', methods=['DELETE'])
+@token_validator(request)
+def delete_person_education(person_education_id):
+    return Response.execute(PersonService.delete_person_education, person_education_id, error_status_code=400)

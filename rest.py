@@ -7,6 +7,7 @@ from app.rest.company.CompanyRest import company_rest
 from app.rest.contact.ContactRest import contact_rest
 from app.rest.job.JobRest import job_rest
 from app.rest.login.LoginRest import login_rest
+from app.rest.messages.MessagesRest import messages_rest
 from app.rest.page.PageRest import page_rest
 from app.rest.person.PersonRest import person_rest
 from app.rest.questionnaire.QuestionnaireRest import questionnaire_rest
@@ -38,6 +39,7 @@ app.register_blueprint(approval_selective_process_rest)
 app.register_blueprint(password_rest)
 app.register_blueprint(company_rest)
 app.register_blueprint(contact_rest)
+app.register_blueprint(messages_rest)
 
 if __name__ == '__main__':
     if production:

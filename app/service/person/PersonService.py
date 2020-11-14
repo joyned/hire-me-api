@@ -1,5 +1,6 @@
 from app.model.context.HireMeContext import HireMeContext
 from app.model.person.Person import Person
+from app.model.person.PersonEducation import PersonEducation
 from app.model.person.PersonHability import PersonAbility
 from app.model.person.ProfessionalHistory import ProfessionalHistory
 from app.repository.person import PersonRepository
@@ -171,3 +172,70 @@ def get_person_profile(person_id):
         'professionalHistories': person_professional_histories,
         'abilities': person_abilities
     }
+
+
+def get_person_education(request):
+    context = HireMeContext()
+    context.build(request)
+
+    result = PersonRepository.get_person_education(context.person_id)
+
+    person_educations = []
+
+    if result is not None:
+        for row in result:
+            person_education = PersonEducation()
+            person_education.id = row[0]
+            person_education.person_id = row[1]
+            person_education.institution = row[2]
+            person_education.course = row[3]
+            person_education.initial_date = row[4]
+            person_education.final_date = row[5]
+            if row[6] == 'T':
+                person_education.current_study = True
+            else:
+                person_education.current_study = False
+
+            person_educations.append(person_education.serialize())
+
+    return person_educations
+
+
+def person_education(request):
+    context = HireMeContext()
+    context.build(request)
+
+    person_education = PersonEducation()
+    data = request.get_json()
+
+    person_education.id = data.get('id')
+    person_education.person_id = context.person_id
+    person_education.institution = data.get('institution')
+    person_education.course = data.get('course')
+    person_education.initial_date = data.get('initialDate')
+    person_education.final_date = data.get('finalDate')
+    person_education.current_study = data.get('currentStudy')
+
+    if person_education.id is None or person_education.id == 0:
+        PersonRepository.insert_person_education(person_education)
+    else:
+        PersonRepository.update_person_education(person_education)
+
+
+def person_education_batch(request, person_id):
+    data = request.get_json()
+
+    for row in data.get('personEducations'):
+        person_education = PersonEducation()
+        person_education.person_id = person_id
+        person_education.institution = row.get('institution')
+        person_education.course = row.get('course')
+        person_education.initial_date = row.get('initialDate')
+        person_education.final_date = row.get('finalDate')
+        person_education.current_study = row.get('currentStudy')
+
+        PersonRepository.insert_person_education(person_education)
+
+
+def delete_person_education(person_education_id):
+    PersonRepository.delete_person_education(person_education_id)
