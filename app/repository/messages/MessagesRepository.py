@@ -87,7 +87,7 @@ def get_candidate_messages_by_room_id(room_id):
         JOIN Pessoa Para
             ON Para.Id = Mensagens.Id_Para
         WHERE Mensagens.Id_Sala = ?
-        ORDER BY Mensagens.Data_Envio DESC
+        ORDER BY Mensagens.Data_Envio
     """
 
     param = (room_id,)
