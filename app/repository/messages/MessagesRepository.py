@@ -47,7 +47,7 @@ def get_messages(from_id, to_id):
         OR
         (Mensagens.Id_De = ?
         AND Mensagens.Id_Para = ?)
-        ORDER BY Mensagens.Data_Envio DESC
+        ORDER BY Mensagens.Data_Envio
     """
 
     param = (from_id, to_id, to_id, from_id)
