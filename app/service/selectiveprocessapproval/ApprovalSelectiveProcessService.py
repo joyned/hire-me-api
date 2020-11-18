@@ -12,10 +12,12 @@ def approve(request, approved_step_id):
 
     ApprovalSelectiveProcessRepository.change_status_to_approved(approved_step_id)
 
+    send_approval_email(approved_step_id)
+
     if next_step_id is not None and next_step_id[0] is not None:
         ApprovalSelectiveProcessRepository.insert_new_step(next_step_id[0], approved_step_id)
-
-    send_approval_email(approved_step_id)
+    else:
+        return {'lastStep': True}
 
 
 def get_next_step_by_current_step(approved_step_id):
