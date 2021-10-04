@@ -16,7 +16,7 @@ connection = {
 connection_local = {
     'host': 'localhost',
     'username': 'SA',
-    'password': '$b4tr0x2568251$',
+    'password': 'bla',
     'db': 'HireMeRemodel',
     'driver': db_properties['user']['driver']
 }
