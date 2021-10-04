@@ -1,6 +1,6 @@
 user:
-    username: joyned
-    password: $b4tr0x2568251$
+    username: BLA
+    password: BLA
     db: HireMe
     host: hireme-database.database.windows.net
     driver: '{ODBC Driver 17 for SQL Server}'
